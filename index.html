@@ -41,7 +41,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .sleg{width:6px;height:12px;background:var(--shd)}
 
 /* Container base */
-.ct{position:relative;cursor:grab;transition:transform .1s;flex-shrink:0}
+.ct{position:relative;cursor:grab;transition:transform .1s;flex-shrink:0;touch-action:manipulation;-webkit-touch-callout:none;user-select:none}
 .ct:hover{transform:translateY(-2px);z-index:5}
 .ct.sel{animation:glow 1.2s infinite;z-index:10}
 .ct.srhit{animation:hit .8s infinite;z-index:8}
@@ -191,8 +191,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .st .btn{padding:3px 8px;font-size:11px}
   .lv{padding:3px 4px}
   .lv-l{font-size:10px;margin-bottom:2px}
-  .lv-c{gap:2px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-  .ct{transform:scale(0.76);transform-origin:bottom left;margin:-3px -2px}
+  .lv-c{gap:1px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .ct{transform:scale(0.76);transform-origin:bottom left;margin:-3px -3px}
   .ct-lb{font-size:9px}
   .sb{height:3px}
   .pn{width:100%;max-height:45vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
@@ -348,7 +348,7 @@ function render(){
     if(li<S.shelf.levels.length-1)shelfH+='<div class="sb"></div>';
   });
   document.getElementById('app').innerHTML=`
-    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">v7</span><div class="hdr-r"><button class="btn bp" onclick="cloudSync()">☁ 复制链接</button><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✓':'悬浮✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button><button class="btn bg" onclick="importD()">导入↑</button><button class="btn bg" onclick="resetAll()">↺</button></div></div>
+    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.0</span><div class="hdr-r"><button class="btn bp" onclick="manualSave()">☁保存</button><button class="btn bg" onclick="cloudSync()">复制链接</button><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✓':'悬浮✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button><button class="btn bg" onclick="importD()">导入↑</button><button class="btn bg" onclick="resetAll()">↺</button></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
       <select class="fsel" id="fs-t"><option value="">全部类型</option>${Object.keys(TYPES).map(k=>`<option value="${k}" ${S.ft===k?'selected':''}>${TYPES[k].l}</option>`).join('')}</select>
       <select class="fsel" id="fs-l"><option value="">全部地点</option>${getLocs().map(l=>`<option value="${esc(l)}" ${S.fl===l?'selected':''}>${esc(l)}</option>`).join('')}</select>
@@ -384,11 +384,104 @@ function render(){
     tt.style.left=Math.max(8,Math.min(r.left,window.innerWidth-240))+'px';
     const below=r.bottom+8;tt.style.top=(below>window.innerHeight-120?r.top-tt.offsetHeight-8:below)+'px';
   }
-  document.querySelectorAll('.ct').forEach(el=>{
-    if(isMob){el.addEventListener('touchstart',e=>{e.stopPropagation();showTip(el)},{passive:true})}
-    else{el.addEventListener('mouseenter',()=>showTip(el));el.addEventListener('mouseleave',()=>{document.getElementById('tooltip').style.display='none'})}
-  });
-  if(isMob)document.addEventListener('touchstart',()=>{document.getElementById('tooltip').style.display='none'},{passive:true});
+  // Desktop: hover tooltip
+  if(!isMob){
+    document.querySelectorAll('.ct').forEach(el=>{
+      el.addEventListener('mouseenter',()=>showTip(el));
+      el.addEventListener('mouseleave',()=>{document.getElementById('tooltip').style.display='none'});
+    });
+  }
+  // Mobile: double-tap = detail, touch drag in move mode
+  if(isMob){
+    let lastTap=0,lastTapCid='';
+    let touchDrag=null;
+    document.querySelectorAll('.ct').forEach(el=>{
+      el.addEventListener('touchstart',e=>{
+        const cid=el.dataset.cid;if(!cid)return;
+        document.getElementById('tooltip').style.display='none';
+        // Move mode: start touch drag
+        if(S.moveMode){
+          e.preventDefault();
+          const touch=e.touches[0];
+          const rect=el.getBoundingClientRect();
+          const lvC=el.closest('.lv-c');
+          touchDrag={cid,lvid:lvC?.dataset?.lv,startX:touch.clientX,startY:touch.clientY,el,ghost:null};
+          // Create ghost after small movement
+          return;
+        }
+        // Double-tap detection
+        const now=Date.now();
+        if(now-lastTap<350&&lastTapCid===cid){
+          // Double tap → show detail panel
+          e.preventDefault();
+          S.sel=cid;S.editing=false;S.adding=null;S.tab='info';render();
+          lastTap=0;lastTapCid='';return;
+        }
+        lastTap=now;lastTapCid=cid;
+        // Single tap → show tooltip if enabled
+        if(S.showTip){e.stopPropagation();showTip(el)}
+      },{passive:false});
+    });
+    // Touch drag handlers
+    document.addEventListener('touchmove',e=>{
+      if(!touchDrag)return;
+      e.preventDefault();
+      const touch=e.touches[0];
+      const dx=touch.clientX-touchDrag.startX,dy=touch.clientY-touchDrag.startY;
+      if(!touchDrag.ghost&&(Math.abs(dx)>8||Math.abs(dy)>8)){
+        // Create ghost
+        const g=touchDrag.el.cloneNode(true);
+        g.style.cssText='position:fixed;opacity:0.6;z-index:1000;pointer-events:none;transform:scale(0.7);';
+        document.body.appendChild(g);
+        touchDrag.ghost=g;
+        touchDrag.el.style.opacity='0.2';
+      }
+      if(touchDrag.ghost){
+        touchDrag.ghost.style.left=(touch.clientX-30)+'px';
+        touchDrag.ghost.style.top=(touch.clientY-30)+'px';
+        // Highlight target level
+        document.querySelectorAll('.lv-c').forEach(lc=>{lc.style.outline='none'});
+        const under=document.elementFromPoint(touch.clientX,touch.clientY);
+        const targetLv=under?.closest('.lv-c');
+        if(targetLv)targetLv.style.outline='2px dashed #2a6ab0';
+      }
+    },{passive:false});
+    document.addEventListener('touchend',e=>{
+      if(!touchDrag)return;
+      if(touchDrag.ghost){
+        touchDrag.ghost.remove();
+        touchDrag.el.style.opacity='';
+        document.querySelectorAll('.lv-c').forEach(lc=>{lc.style.outline='none'});
+        // Find drop target
+        const touch=e.changedTouches[0];
+        const under=document.elementFromPoint(touch.clientX,touch.clientY);
+        const targetLv=under?.closest('.lv-c');
+        const targetCt=under?.closest('.ct');
+        if(targetLv){
+          const toLvId=targetLv.dataset.lv;
+          const fl=S.shelf.levels.find(l=>l.id===touchDrag.lvid);
+          const tl=S.shelf.levels.find(l=>l.id===toLvId);
+          if(fl&&tl){
+            const ci=fl.containers.findIndex(x=>x.id===touchDrag.cid);
+            if(ci>=0){
+              const[item]=fl.containers.splice(ci,1);
+              if(touchDrag.lvid!==toLvId){item.stackParent=null;fl.containers.forEach(x=>{if(x.stackParent===item.id)x.stackParent=null})}
+              if(targetCt&&targetCt.dataset.cid!==touchDrag.cid){
+                const ti=tl.containers.findIndex(x=>x.id===targetCt.dataset.cid);
+                tl.containers.splice(ti>=0?ti:tl.containers.length,0,item);
+              }else{tl.containers.push(item)}
+              commit('移动',item.label+' → '+tl.label);
+            }
+          }
+        }
+      }
+      touchDrag=null;render();
+    },{passive:false});
+    // Dismiss tooltip on background tap
+    document.addEventListener('touchstart',e=>{
+      if(!e.target.closest('.ct'))document.getElementById('tooltip').style.display='none';
+    },{passive:true});
+  }
 }
 
 function renderShelfOnly(){doSearch();const hs=S.sq||S.ft||S.fl||S.fs;document.querySelectorAll('.ct').forEach(el=>{const cid=el.dataset.cid;if(!cid)return;el.classList.toggle('srhit',hs&&S.hits.includes(cid));el.classList.toggle('dim',hs&&!S.hits.includes(cid))})}
@@ -537,7 +630,14 @@ const API='https://api.npoint.io';
 
 async function cloudPush(){
   if(!cloudId||cloudBusy)return;cloudBusy=true;
-  try{await fetch(API+'/'+cloudId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})})}catch(e){}
+  try{
+    const r=await fetch(API+'/'+cloudId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})});
+    if(!r.ok){
+      // npoint POST failed, try PUT
+      const r2=await fetch(API+'/'+cloudId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})});
+      if(!r2.ok)throw new Error(r2.status);
+    }
+  }catch(e){toast('⚠ 保存失败');console.warn('push',e)}
   cloudBusy=false;
 }
 async function cloudPull(){
@@ -562,6 +662,7 @@ async function cloudPull(){
   toast('已初始化云端');
 })();
 window.cloudSync=()=>{navigator.clipboard?.writeText(location.href);toast('链接已复制')};
+window.manualSave=async()=>{toast('保存中…');await cloudPush();const ok=await cloudPull();toast(ok?'☁ 已同步':'☁ 已保存')};
 setInterval(()=>{if(cloudId)cloudPull().then(ok=>{if(ok)render()})},30000);
 window.resetAll=()=>{if(!confirm('重置？'))return;S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];S.shelfIdx=0;S.log=[];S.hist=[];S.sel=null;save();toast('已重置');render()};
 window.exportD=()=>{const d=JSON.stringify({shelves:S.shelves,log:S.log,hist:S.hist},null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='soil-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('已导出')};
