@@ -192,7 +192,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .lv{padding:3px 4px}
   .lv-l{font-size:10px;margin-bottom:2px}
   .lv-c{gap:3px}
-  .ct{transform:scale(0.75);transform-origin:bottom left;margin:-4px -3px}
+  .ct{transform:scale(0.45);transform-origin:bottom left;margin:-8px -8px}
   .ct-lb{font-size:9px}
   .sb{height:3px}
   .pn{width:100%;max-height:45vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
@@ -357,7 +357,7 @@ function render(){
     <div class="main"><div class="sa"><div class="st"><span style="color:var(--acc)">⊞</span>${S.shelves.map((sh,i)=>`<button class="btn ${i===S.shelfIdx?'bp':'bg'}" style="padding:3px 12px;font-size:13px" onclick="switchShelf(${i})">${esc(sh.name)}</button>`).join('')}<span class="st-n">${allC().length}个</span><button class="btn ${S.moveMode?'bor':'bg'}" style="padding:2px 8px;font-size:11px" onclick="togMove()">${S.moveMode?'移动中…':'✥移动'}</button>${S.stkMode?'<span style="color:var(--acc);font-size:12px;margin-left:4px">叠放→点目标</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="cancelStk()">取消</button>':''}${S.moveMode&&S.moveSrc?'<span style="color:#2a6ab0;font-size:12px">点击目标层</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="togMove()">取消</button>':''}</div>
       <div class="sf${S.showLabels?'':' hide-labels'}">${shelfH}<div class="sl"><div class="sleg"></div><div class="sleg"></div></div></div></div>
       <div class="pn"><div class="tb">${[['info','信息'],['edit','编辑'],['log','台账'],['hist','历史']].map(([k,v])=>`<button class="tbtn ${S.tab===k?'on':''}" onclick="stab('${k}')">${v}</button>`).join('')}</div><div class="pb">${renderPanel()}</div></div></div>
-    <div class="ftr">${cloudId?'☁ 云端已连接 · 自动同步中':'⚠ 未连接云端 — 点右上角「☁云同步」设置'} · 手机点容器看详情 · 开「✥移动」后先点源再点目标</div>
+    <div class="ftr">${CLOUD_ID?'☁ 云端已锁定 · 所有设备自动同步':cloudId?'☁ 临时云空间 · 请把码填入CLOUD_ID固定':'⚠ 未连接云端'}</div>
     <div class="toast" id="toast" style="display:none"></div>
     <div class="tooltip" id="tooltip" style="display:none"></div>`;
   // Bind events
@@ -413,7 +413,7 @@ function renderCtn(c,lv,ci,hs){
   const sz=SZ[c.size]||SZ.m,sel=S.sel===c.id,hit=S.hits.includes(c.id),dim=hs&&!hit;
   const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':''].filter(Boolean).join(' ');
   const cm=c.color||'#999',cd=dk(cm),cl=lt(cm);
-  const fn=S.stkMode?`stkTarget('${c.id}')`:S.moveMode?`moveTap('${c.id}','${lv.id}')`:`selC('${c.id}')`;
+  const fn=S.stkMode?`event.stopPropagation();stkTarget('${c.id}')`:S.moveMode?`event.stopPropagation();moveTap('${c.id}','${lv.id}')`:`selC('${c.id}')`;
   return `<div class="${cls}" style="width:${sz.w}px" data-cid="${c.id}" draggable="true" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
     ${ctnTop(c)}
     <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}<div class="ct-sti s${c.status||'在库'}"></div></div>
@@ -423,7 +423,7 @@ function renderStack(base,top,lv,hs){
   const szB=SZ[base.size]||SZ.m,szT=SZ[top.size]||SZ.m,w=Math.max(szB.w,szT.w);
   const cmB=base.color||'#999',cdB=dk(cmB),clB=lt(cmB),cmT=top.color||'#999',cdT=dk(cmT),clT=lt(cmT);
   const selB=S.sel===base.id,selT=S.sel===top.id,hitB=S.hits.includes(base.id),hitT=S.hits.includes(top.id),dim=hs&&!hitB&&!hitT;
-  const fnB=S.stkMode?`stkTarget('${base.id}')`:S.moveMode?`moveTap('${base.id}','${lv.id}')`:`selC('${base.id}')`,fnT=S.stkMode?`stkTarget('${top.id}')`:S.moveMode?`moveTap('${top.id}','${lv.id}')`:`selC('${top.id}')`;
+  const fnB=S.stkMode?`event.stopPropagation();stkTarget('${base.id}')`:S.moveMode?`event.stopPropagation();moveTap('${base.id}','${lv.id}')`:`selC('${base.id}')`,fnT=S.stkMode?`event.stopPropagation();stkTarget('${top.id}')`:S.moveMode?`event.stopPropagation();moveTap('${top.id}','${lv.id}')`:`selC('${top.id}')`;
   return `<div class="stkg${dim?' dim':''}" style="width:${w}px" data-cid="${base.id}">
     <div class="ct ct-top${selT?' sel':''}${hitT?' srhit':''}" style="width:${szT.w}px" data-cid="${top.id}" onclick="event.stopPropagation();${fnT}" draggable="true" ondragstart="dragS(event,'${top.id}','${lv.id}')">
       ${ctnTop(top)}
@@ -528,7 +528,11 @@ window.showTable=()=>{
 };
 
 // ===== 全自动云同步 — 打开即同步，改了即保存 =====
-let cloudId=location.hash.slice(1)||localStorage.getItem('soil-cloud-id')||'';
+// ★ 首次部署后，打开网页会自动创建云空间，地址栏出现 #xxx
+// ★ 把 xxx 填到下面引号里，重新上传到GitHub，所有设备就永久同步了
+const CLOUD_ID = ''; // ← 填入你的同步码，例如 'a1b2c3d4e5f6'
+
+let cloudId=CLOUD_ID||location.hash.slice(1)||localStorage.getItem('soil-cloud-id')||'';
 let cloudBusy=false;
 const API='https://api.npoint.io';
 
@@ -543,25 +547,22 @@ async function cloudPull(){
     const d=await r.json();if(d.shelves){S.shelves=d.shelves;if(d.log)S.log=d.log;save();cloudBusy=false;return true}
   }catch(e){}cloudBusy=false;return false;
 }
-// 页面加载自动处理：有码就拉取，没码就创建
 (async function(){
   if(cloudId){
     localStorage.setItem('soil-cloud-id',cloudId);
-    if(!location.hash)history.replaceState(null,'',location.pathname+'#'+cloudId);
+    if(!location.hash&&!CLOUD_ID)history.replaceState(null,'',location.pathname+'#'+cloudId);
     const ok=await cloudPull();if(ok)render();
   }else{
     try{
       const r=await fetch(API+'/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})});
-      if(r.ok){cloudId=(r.url||'').split('/').pop();if(cloudId&&cloudId.length>3){localStorage.setItem('soil-cloud-id',cloudId);history.replaceState(null,'',location.pathname+'#'+cloudId);toast('☁ 云空间已就绪')}}
+      if(r.ok){cloudId=(r.url||'').split('/').pop();if(cloudId&&cloudId.length>3){localStorage.setItem('soil-cloud-id',cloudId);history.replaceState(null,'',location.pathname+'#'+cloudId);toast('☁ 已创建云空间，请把地址栏 # 后面的码填入代码的 CLOUD_ID')}}
     }catch(e){}
   }
 })();
-// 点☁按钮 = 复制链接
 window.cloudSync=()=>{
-  if(cloudId){navigator.clipboard?.writeText(location.href);toast('链接已复制，发给同事即可')}
-  else toast('云端未连接，请刷新页面重试');
+  if(cloudId){navigator.clipboard?.writeText(CLOUD_ID?location.href+'#'+cloudId:location.href);toast('链接已复制')}
+  else toast('未连接，请刷新重试');
 };
-// 每30秒静默拉取最新
 setInterval(()=>{if(cloudId)cloudPull().then(ok=>{if(ok)render()})},30000);
 window.resetAll=()=>{if(!confirm('重置？'))return;S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];S.shelfIdx=0;S.log=[];S.hist=[];S.sel=null;save();toast('已重置');render()};
 window.exportD=()=>{const d=JSON.stringify({shelves:S.shelves,log:S.log,hist:S.hist},null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='soil-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('已导出')};
