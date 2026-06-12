@@ -191,8 +191,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .st .btn{padding:3px 8px;font-size:11px}
   .lv{padding:3px 4px}
   .lv-l{font-size:10px;margin-bottom:2px}
-  .lv-c{gap:3px}
-  .ct{transform:scale(0.76);transform-origin:bottom left;margin:-3px -4px}
+  .lv-c{gap:2px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .ct{transform:scale(0.76);transform-origin:bottom left;margin:-3px -2px}
   .ct-lb{font-size:9px}
   .sb{height:3px}
   .pn{width:100%;max-height:45vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
@@ -370,6 +370,7 @@ function render(){
   // Tooltip: hover on desktop, tap on mobile
   const isMob='ontouchstart'in window||navigator.maxTouchPoints>0;
   function showTip(el){
+    if(S.moveMode||S.stkMode)return;
     const cid=el.dataset.cid;if(!cid)return;const f=findC(cid);if(!f)return;const{c,l}=f;
     const t=TYPES[c.type]||{l:'?'};const tt=document.getElementById('tooltip');
     let h=`<div class="tt-n">${esc(c.label||'未命名')}</div><div class="tt-m">${t.l} · ${SL[c.size]||'中'} · ${esc(l.label)}</div>`;
@@ -527,12 +528,9 @@ window.showTable=()=>{
   const b=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='土样台账_'+new Date().toISOString().slice(0,10)+'.csv';a.click();toast('已导出CSV（Excel可直接打开）');
 };
 
-// ===== 全自动云同步 — 打开即同步，改了即保存 =====
-// ★ 首次部署后，打开网页会自动创建云空间，地址栏出现 #xxx
-// ★ 把 xxx 填到下面引号里，重新上传到GitHub，所有设备就永久同步了
-const CLOUD_ID = 'c785548c96d5ef57dd'; // 已锁定云空间
-
-let cloudId=CLOUD_ID||location.hash.slice(1)||localStorage.getItem('soil-cloud-id')||'';
+// ===== 云端 = 唯一数据源 =====
+const CLOUD_ID = 'c785548c96d5ef57dd';
+let cloudId=CLOUD_ID;
 let cloudBusy=false;
 const API='https://api.npoint.io';
 
@@ -543,26 +541,26 @@ async function cloudPush(){
 }
 async function cloudPull(){
   if(!cloudId||cloudBusy)return false;cloudBusy=true;
-  try{const r=await fetch(API+'/'+cloudId);if(!r.ok){cloudBusy=false;return false}
-    const d=await r.json();if(d.shelves){S.shelves=d.shelves;if(d.log)S.log=d.log;save();cloudBusy=false;return true}
-  }catch(e){}cloudBusy=false;return false;
+  try{
+    const r=await fetch(API+'/'+cloudId);if(!r.ok){cloudBusy=false;return false}
+    const d=await r.json();
+    const has=d.shelves&&d.shelves.length>0&&d.shelves.some(s=>s.levels.some(l=>l.containers.length>0));
+    if(has){S.shelves=d.shelves;if(d.log)S.log=d.log;save();cloudBusy=false;return true}
+    cloudBusy=false;return false;
+  }catch(e){cloudBusy=false;return false}
 }
+// 页面加载：云端有数据就拉，没有就初始化推上去
 (async function(){
-  if(cloudId){
-    localStorage.setItem('soil-cloud-id',cloudId);
-    if(!location.hash&&!CLOUD_ID)history.replaceState(null,'',location.pathname+'#'+cloudId);
-    const ok=await cloudPull();if(ok)render();
-  }else{
-    try{
-      const r=await fetch(API+'/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})});
-      if(r.ok){cloudId=(r.url||'').split('/').pop();if(cloudId&&cloudId.length>3){localStorage.setItem('soil-cloud-id',cloudId);history.replaceState(null,'',location.pathname+'#'+cloudId);toast('☁ 已创建云空间，请把地址栏 # 后面的码填入代码的 CLOUD_ID')}}
-    }catch(e){}
-  }
+  if(!cloudId)return;
+  const ok=await cloudPull();
+  if(ok){render();return}
+  // 云端空 → 用初始数据填充
+  S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];
+  save();render();
+  await cloudPush();
+  toast('已初始化云端');
 })();
-window.cloudSync=()=>{
-  if(cloudId){navigator.clipboard?.writeText(CLOUD_ID?location.href+'#'+cloudId:location.href);toast('链接已复制')}
-  else toast('未连接，请刷新重试');
-};
+window.cloudSync=()=>{navigator.clipboard?.writeText(location.href);toast('链接已复制')};
 setInterval(()=>{if(cloudId)cloudPull().then(ok=>{if(ok)render()})},30000);
 window.resetAll=()=>{if(!confirm('重置？'))return;S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];S.shelfIdx=0;S.log=[];S.hist=[];S.sel=null;save();toast('已重置');render()};
 window.exportD=()=>{const d=JSON.stringify({shelves:S.shelves,log:S.log,hist:S.hist},null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='soil-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('已导出')};
