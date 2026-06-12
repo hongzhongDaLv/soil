@@ -176,36 +176,37 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .stkmode .ct:not(.sel):hover{outline-color:var(--acc)}
 @media(max-width:768px){
   body{font-size:14px}
-  .hdr{flex-wrap:wrap;gap:6px;padding:6px 10px}
-  .hdr-t{font-size:17px}
-  .hdr-r{width:100%;display:flex;flex-wrap:wrap;gap:4px}
-  .hdr-r .btn{padding:5px 8px;font-size:11px;flex:1;min-width:0;text-align:center}
-  .sbar{flex-wrap:wrap;gap:5px;padding:5px 10px}
+  .hdr{flex-wrap:wrap;gap:4px;padding:5px 8px}
+  .hdr-t{font-size:16px}
+  .hdr-r{width:100%;display:flex;flex-wrap:wrap;gap:3px}
+  .hdr-r .btn{padding:4px 6px;font-size:10px;flex:1;min-width:0;text-align:center}
+  .sbar{flex-wrap:wrap;gap:4px;padding:4px 8px}
   .sbar-w{width:100%;min-width:0}
-  #si{font-size:14px;padding:8px 10px}
-  .fsel{font-size:12px;flex:1;min-width:0}
+  #si{font-size:13px;padding:6px 8px}
+  .fsel{font-size:11px;flex:1;min-width:0;padding:4px 4px}
   .main{flex-direction:column}
-  .sa{padding:6px 8px}
-  .sf{min-width:0;width:100%;display:block;border-radius:4px}
-  .st{flex-wrap:wrap;gap:5px;font-size:14px}
-  .st .btn{padding:4px 10px;font-size:12px}
-  .lv{padding:4px 6px}
-  .lv-c{gap:6px}
-  .ct{transform:scale(1.1);transform-origin:bottom center;margin:2px}
-  .ct-lb{font-size:10px}
-  .pn{width:100%;max-height:50vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
-  .pb{padding:10px 12px}
-  .tbtn{font-size:13px;padding:8px 2px}
-  .tooltip{max-width:220px;font-size:12px}
-  .ic-n{font-size:16px}
-  .ir-k{flex:0 0 68px;font-size:12px}
-  .ir-v{font-size:13px}
-  .fd input,.fd select,.fd textarea{font-size:14px;padding:8px}
-  .szb{padding:6px 10px}
-  .btn{padding:7px 12px}
-  .ia{gap:6px}
-  .ia .btn{flex:1;text-align:center}
-  .empty{font-size:13px;padding:16px 8px}
+  .sa{padding:4px 4px}
+  .sf{min-width:0;width:100%;display:block;border-radius:4px;padding:1px 3px}
+  .st{flex-wrap:wrap;gap:4px;font-size:13px;margin-bottom:4px}
+  .st .btn{padding:3px 8px;font-size:11px}
+  .lv{padding:3px 4px}
+  .lv-l{font-size:10px;margin-bottom:2px}
+  .lv-c{gap:3px}
+  .ct{transform:scale(0.75);transform-origin:bottom left;margin:-4px -3px}
+  .ct-lb{font-size:9px}
+  .sb{height:3px}
+  .pn{width:100%;max-height:45vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
+  .pb{padding:8px 10px}
+  .tbtn{font-size:12px;padding:7px 2px}
+  .tooltip{max-width:200px;font-size:11px;padding:8px 10px}
+  .tooltip .tt-n{font-size:13px}
+  .ic-n{font-size:15px}
+  .ir-k{flex:0 0 60px;font-size:11px}
+  .ir-v{font-size:12px}
+  .fd input,.fd select,.fd textarea{font-size:13px;padding:6px}
+  .btn{padding:6px 10px;font-size:12px}
+  .empty{font-size:12px;padding:12px 6px}
+  .add-b{width:20px;height:20px;font-size:12px}
 }
 </style>
 </head>
@@ -318,7 +319,7 @@ const INIT4={id:'shelf4',name:'架2',levels:[
   ]},
 ]};
 
-let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true};
+let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null};
 Object.defineProperty(S,'shelf',{get(){return S.shelves?S.shelves[S.shelfIdx]:null}});
 function save(){try{localStorage.setItem('sv7-s',JSON.stringify(S.shelves));localStorage.setItem('sv7-l',JSON.stringify(S.log));localStorage.setItem('sv7-h',JSON.stringify(S.hist))}catch{}}
 function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))]}
@@ -343,20 +344,20 @@ function render(){
     });
     lv.containers.forEach(c=>{if(!done.has(c.id)){done.add(c.id);ch+=renderCtn(c,lv,0,hs)}});
     shelfH+=`<div class="lv"><div class="lv-l">${esc(lv.label)}</div>
-      <div class="lv-c${S.stkMode?' stkmode':''}" data-lv="${lv.id}" ondragover="event.preventDefault();this.classList.add('dov')" ondragleave="this.classList.remove('dov')" ondrop="onDrop(event,'${lv.id}',${lv.containers.length});this.classList.remove('dov')">${ch}<button class="add-b" onclick="startAdd('${lv.id}')">＋</button></div></div>`;
+      <div class="lv-c${S.stkMode?' stkmode':''}" data-lv="${lv.id}" onclick="moveToLevel('${lv.id}')" ondragover="event.preventDefault();this.classList.add('dov')" ondragleave="this.classList.remove('dov')" ondrop="onDrop(event,'${lv.id}',${lv.containers.length});this.classList.remove('dov')">${ch}<button class="add-b" onclick="event.stopPropagation();startAdd('${lv.id}')">＋</button></div></div>`;
     if(li<S.shelf.levels.length-1)shelfH+='<div class="sb"></div>';
   });
   document.getElementById('app').innerHTML=`
-    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">v7</span><div class="hdr-r"><button class="btn ${cloudId?'bp':'bor'}" onclick="cloudSync()">${cloudId?'☁ 已连接':'☁ 云同步'}</button><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button><button class="btn bg" onclick="importD()">导入↑</button><button class="btn bg" onclick="resetAll()">↺</button></div></div>
+    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">v7</span><div class="hdr-r"><button class="btn bp" onclick="cloudSync()">☁ 复制链接</button><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button><button class="btn bg" onclick="importD()">导入↑</button><button class="btn bg" onclick="resetAll()">↺</button></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
       <select class="fsel" id="fs-t"><option value="">全部类型</option>${Object.keys(TYPES).map(k=>`<option value="${k}" ${S.ft===k?'selected':''}>${TYPES[k].l}</option>`).join('')}</select>
       <select class="fsel" id="fs-l"><option value="">全部地点</option>${getLocs().map(l=>`<option value="${esc(l)}" ${S.fl===l?'selected':''}>${esc(l)}</option>`).join('')}</select>
       <select class="fsel" id="fs-s"><option value="">全部状态</option>${STATS.map(s=>`<option value="${s}" ${S.fs===s?'selected':''}>${s}</option>`).join('')}</select>
       ${hs?`<span class="scnt">${S.hits.length}项</span><button class="btn bg" style="padding:3px 10px;font-size:12px" onclick="clearSr()">清除</button>`:''}</div>
-    <div class="main"><div class="sa"><div class="st"><span style="color:var(--acc)">⊞</span>${S.shelves.map((sh,i)=>`<button class="btn ${i===S.shelfIdx?'bp':'bg'}" style="padding:3px 12px;font-size:13px" onclick="switchShelf(${i})">${esc(sh.name)}</button>`).join('')}<span class="st-n">${allC().length}个容器</span>${S.stkMode?'<span style="color:var(--acc);font-size:13px;margin-left:8px">叠放模式：点击目标</span><button class="btn bg" style="padding:2px 8px;font-size:12px;margin-left:4px" onclick="cancelStk()">取消</button>':''}</div>
+    <div class="main"><div class="sa"><div class="st"><span style="color:var(--acc)">⊞</span>${S.shelves.map((sh,i)=>`<button class="btn ${i===S.shelfIdx?'bp':'bg'}" style="padding:3px 12px;font-size:13px" onclick="switchShelf(${i})">${esc(sh.name)}</button>`).join('')}<span class="st-n">${allC().length}个</span><button class="btn ${S.moveMode?'bor':'bg'}" style="padding:2px 8px;font-size:11px" onclick="togMove()">${S.moveMode?'移动中…':'✥移动'}</button>${S.stkMode?'<span style="color:var(--acc);font-size:12px;margin-left:4px">叠放→点目标</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="cancelStk()">取消</button>':''}${S.moveMode&&S.moveSrc?'<span style="color:#2a6ab0;font-size:12px">点击目标层</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="togMove()">取消</button>':''}</div>
       <div class="sf${S.showLabels?'':' hide-labels'}">${shelfH}<div class="sl"><div class="sleg"></div><div class="sleg"></div></div></div></div>
       <div class="pn"><div class="tb">${[['info','信息'],['edit','编辑'],['log','台账'],['hist','历史']].map(([k,v])=>`<button class="tbtn ${S.tab===k?'on':''}" onclick="stab('${k}')">${v}</button>`).join('')}</div><div class="pb">${renderPanel()}</div></div></div>
-    <div class="ftr">拖拽移动 · 点击查看 · 变更自动记入台账 · 数据存于浏览器本地（非云端）</div>
+    <div class="ftr">${cloudId?'☁ 云端已连接 · 自动同步中':'⚠ 未连接云端 — 点右上角「☁云同步」设置'} · 手机点容器看详情 · 开「✥移动」后先点源再点目标</div>
     <div class="toast" id="toast" style="display:none"></div>
     <div class="tooltip" id="tooltip" style="display:none"></div>`;
   // Bind events
@@ -412,7 +413,7 @@ function renderCtn(c,lv,ci,hs){
   const sz=SZ[c.size]||SZ.m,sel=S.sel===c.id,hit=S.hits.includes(c.id),dim=hs&&!hit;
   const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':''].filter(Boolean).join(' ');
   const cm=c.color||'#999',cd=dk(cm),cl=lt(cm);
-  const fn=S.stkMode?`stkTarget('${c.id}')`:`selC('${c.id}')`;
+  const fn=S.stkMode?`stkTarget('${c.id}')`:S.moveMode?`moveTap('${c.id}','${lv.id}')`:`selC('${c.id}')`;
   return `<div class="${cls}" style="width:${sz.w}px" data-cid="${c.id}" draggable="true" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
     ${ctnTop(c)}
     <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}<div class="ct-sti s${c.status||'在库'}"></div></div>
@@ -422,7 +423,7 @@ function renderStack(base,top,lv,hs){
   const szB=SZ[base.size]||SZ.m,szT=SZ[top.size]||SZ.m,w=Math.max(szB.w,szT.w);
   const cmB=base.color||'#999',cdB=dk(cmB),clB=lt(cmB),cmT=top.color||'#999',cdT=dk(cmT),clT=lt(cmT);
   const selB=S.sel===base.id,selT=S.sel===top.id,hitB=S.hits.includes(base.id),hitT=S.hits.includes(top.id),dim=hs&&!hitB&&!hitT;
-  const fnB=S.stkMode?`stkTarget('${base.id}')`:`selC('${base.id}')`,fnT=S.stkMode?`stkTarget('${top.id}')`:`selC('${top.id}')`;
+  const fnB=S.stkMode?`stkTarget('${base.id}')`:S.moveMode?`moveTap('${base.id}','${lv.id}')`:`selC('${base.id}')`,fnT=S.stkMode?`stkTarget('${top.id}')`:S.moveMode?`moveTap('${top.id}','${lv.id}')`:`selC('${top.id}')`;
   return `<div class="stkg${dim?' dim':''}" style="width:${w}px" data-cid="${base.id}">
     <div class="ct ct-top${selT?' sel':''}${hitT?' srhit':''}" style="width:${szT.w}px" data-cid="${top.id}" onclick="event.stopPropagation();${fnT}" draggable="true" ondragstart="dragS(event,'${top.id}','${lv.id}')">
       ${ctnTop(top)}
@@ -468,7 +469,32 @@ function ir(k,v){return `<div class="ir"><span class="ir-k">${k}</span><span cla
 function ef(l,k,v,p){return `<div class="fd"><label>${l}</label><input value="${esc(v||'')}" placeholder="${p||''}" oninput="edF('${k}',this.value)"></div>`}
 function ea(l,k,v){return `<div class="fd"><label>${l}</label><textarea oninput="edF('${k}',this.value)">${esc(v||'')}</textarea></div>`}
 
-window.selC=id=>{if(S.stkMode)return;S.sel=id;S.editing=false;S.adding=null;S.tab='info';render()};
+window.selC=id=>{if(S.stkMode||S.moveMode)return;S.sel=id;S.editing=false;S.adding=null;S.tab='info';render()};
+window.togMove=()=>{S.moveMode=!S.moveMode;S.moveSrc=null;if(!S.moveMode)toast('移动模式关闭');render()};
+window.moveTap=(cid,lvid)=>{
+  if(!S.moveMode)return;
+  if(!S.moveSrc){S.moveSrc={cid,lvid};S.sel=cid;toast('已选中，点击目标层放置');render();return}
+  // Second tap on a container = place before it
+  if(S.moveSrc.cid===cid){S.moveSrc=null;toast('取消');render();return}
+  const fl=S.shelf.levels.find(l=>l.id===S.moveSrc.lvid),tl=S.shelf.levels.find(l=>l.id===lvid);
+  if(!fl||!tl)return;const ci=fl.containers.findIndex(x=>x.id===S.moveSrc.cid);if(ci<0)return;
+  const[item]=fl.containers.splice(ci,1);
+  if(S.moveSrc.lvid!==lvid){item.stackParent=null;fl.containers.forEach(x=>{if(x.stackParent===item.id)x.stackParent=null})}
+  const ti=tl.containers.findIndex(x=>x.id===cid);
+  tl.containers.splice(ti>=0?ti:tl.containers.length,0,item);
+  commit('移动',item.label+(S.moveSrc.lvid===lvid?' 层内重排':' → '+tl.label));
+  S.moveSrc=null;render();
+};
+window.moveToLevel=lvid=>{
+  if(!S.moveMode||!S.moveSrc)return;
+  const fl=S.shelf.levels.find(l=>l.id===S.moveSrc.lvid),tl=S.shelf.levels.find(l=>l.id===lvid);
+  if(!fl||!tl)return;const ci=fl.containers.findIndex(x=>x.id===S.moveSrc.cid);if(ci<0)return;
+  const[item]=fl.containers.splice(ci,1);
+  if(S.moveSrc.lvid!==lvid){item.stackParent=null;fl.containers.forEach(x=>{if(x.stackParent===item.id)x.stackParent=null})}
+  tl.containers.push(item);
+  commit('移动',item.label+' → '+tl.label);
+  S.moveSrc=null;render();
+};
 window.stab=t=>{S.tab=t;render()};
 window.startEdit=()=>{const f=findC(S.sel);if(!f)return;S.ef={...f.c};S.editing=true;S.adding=null;S.tab='edit';render();bindSel()};
 window.startAdd=lv=>{S.ef={id:mid(),type:'woven_bag',color:'#7a8e6a',size:'m',label:'',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null};S.adding=lv;S.editing=false;S.tab='edit';render();bindSel()};
@@ -501,56 +527,41 @@ window.showTable=()=>{
   const b=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='土样台账_'+new Date().toISOString().slice(0,10)+'.csv';a.click();toast('已导出CSV（Excel可直接打开）');
 };
 
-// ===== CLOUD SYNC via npoint.io — URL即同步 =====
+// ===== 全自动云同步 — 打开即同步，改了即保存 =====
 let cloudId=location.hash.slice(1)||localStorage.getItem('soil-cloud-id')||'';
 let cloudBusy=false;
 const API='https://api.npoint.io';
 
 async function cloudPush(){
   if(!cloudId||cloudBusy)return;cloudBusy=true;
-  try{await fetch(API+'/'+cloudId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})});
-  }catch(e){console.warn('push',e)}
+  try{await fetch(API+'/'+cloudId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})})}catch(e){}
   cloudBusy=false;
 }
 async function cloudPull(){
   if(!cloudId||cloudBusy)return false;cloudBusy=true;
-  try{
-    const res=await fetch(API+'/'+cloudId);
-    if(!res.ok){cloudBusy=false;return false}
-    const d=await res.json();
-    if(d.shelves){S.shelves=d.shelves;if(d.log)S.log=d.log;save();cloudBusy=false;return true}
-  }catch(e){console.warn('pull',e)}
-  cloudBusy=false;return false;
+  try{const r=await fetch(API+'/'+cloudId);if(!r.ok){cloudBusy=false;return false}
+    const d=await r.json();if(d.shelves){S.shelves=d.shelves;if(d.log)S.log=d.log;save();cloudBusy=false;return true}
+  }catch(e){}cloudBusy=false;return false;
 }
-async function cloudCreate(){
-  try{
-    toast('创建云空间…');
-    const res=await fetch(API+'/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})});
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    // npoint returns the data at a new URL
-    const finalUrl=res.url;cloudId=finalUrl.split('/').pop();
-    if(!cloudId||cloudId.length<4)throw new Error('无法获取ID');
-    localStorage.setItem('soil-cloud-id',cloudId);
-    location.hash=cloudId;
-    toast('已创建');
-    alert('云空间已创建！\n\n直接把浏览器地址栏的完整网址分享给同事，\n打开就能看到同一份数据。\n\n同步码：'+cloudId);
-    render();
-  }catch(e){toast('失败');alert('创建失败：'+e.message+'\n\n用 JSON↓ 导出文件发给同事作为备选。')}
-}
-window.cloudSync=()=>{
+// 页面加载自动处理：有码就拉取，没码就创建
+(async function(){
   if(cloudId){
-    const r=prompt('☁ 已连接云端\n同步码：'+cloudId+'\n\n直接分享当前网址即可，别人打开就是同一份数据。\n\n1 = 复制当前网址\n2 = 手动刷新\n3 = 断开','1');
-    if(r==='1'){navigator.clipboard?.writeText(location.href);toast('网址已复制，发给同事即可')}
-    else if(r==='2'){cloudPull().then(ok=>{if(ok){render();toast('已刷新')}else toast('刷新失败')})}
-    else if(r==='3'){cloudId='';localStorage.removeItem('soil-cloud-id');location.hash='';toast('已断开');render()}
+    localStorage.setItem('soil-cloud-id',cloudId);
+    if(!location.hash)history.replaceState(null,'',location.pathname+'#'+cloudId);
+    const ok=await cloudPull();if(ok)render();
   }else{
-    const r=prompt('云同步设置（只需一次）\n\n1 = 创建新空间（首次使用）\n2 = 输入同步码加入','1');
-    if(r==='1')cloudCreate();
-    else if(r==='2'){const code=prompt('粘贴同步码：');if(code&&code.trim()){cloudId=code.trim();localStorage.setItem('soil-cloud-id',cloudId);location.hash=cloudId;cloudPull().then(ok=>{if(ok){render();toast('已连接')}else{toast('失败');cloudId='';localStorage.removeItem('soil-cloud-id');location.hash=''}})}}
+    try{
+      const r=await fetch(API+'/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelves:S.shelves,log:S.log,ts:TS()})});
+      if(r.ok){cloudId=(r.url||'').split('/').pop();if(cloudId&&cloudId.length>3){localStorage.setItem('soil-cloud-id',cloudId);history.replaceState(null,'',location.pathname+'#'+cloudId);toast('☁ 云空间已就绪')}}
+    }catch(e){}
   }
+})();
+// 点☁按钮 = 复制链接
+window.cloudSync=()=>{
+  if(cloudId){navigator.clipboard?.writeText(location.href);toast('链接已复制，发给同事即可')}
+  else toast('云端未连接，请刷新页面重试');
 };
-// Auto-sync
-if(cloudId){localStorage.setItem('soil-cloud-id',cloudId);cloudPull().then(ok=>{if(ok)render()})}
+// 每30秒静默拉取最新
 setInterval(()=>{if(cloudId)cloudPull().then(ok=>{if(ok)render()})},30000);
 window.resetAll=()=>{if(!confirm('重置？'))return;S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];S.shelfIdx=0;S.log=[];S.hist=[];S.sel=null;save();toast('已重置');render()};
 window.exportD=()=>{const d=JSON.stringify({shelves:S.shelves,log:S.log,hist:S.hist},null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='soil-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('已导出')};
