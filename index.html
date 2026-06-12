@@ -174,7 +174,39 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .tooltip .tt-v{font-size:13px}
 .stkmode .ct:not(.sel){cursor:crosshair !important;outline:2px dashed #6aaad444}
 .stkmode .ct:not(.sel):hover{outline-color:var(--acc)}
-@media(max-width:768px){.main{flex-direction:column}.pn{width:100%;max-height:45vh;border-left:none;border-top:2px solid var(--bd)}}
+@media(max-width:768px){
+  body{font-size:14px}
+  .hdr{flex-wrap:wrap;gap:6px;padding:6px 10px}
+  .hdr-t{font-size:17px}
+  .hdr-r{width:100%;display:flex;flex-wrap:wrap;gap:4px}
+  .hdr-r .btn{padding:5px 8px;font-size:11px;flex:1;min-width:0;text-align:center}
+  .sbar{flex-wrap:wrap;gap:5px;padding:5px 10px}
+  .sbar-w{width:100%;min-width:0}
+  #si{font-size:14px;padding:8px 10px}
+  .fsel{font-size:12px;flex:1;min-width:0}
+  .main{flex-direction:column}
+  .sa{padding:6px 8px}
+  .sf{min-width:0;width:100%;display:block;border-radius:4px}
+  .st{flex-wrap:wrap;gap:5px;font-size:14px}
+  .st .btn{padding:4px 10px;font-size:12px}
+  .lv{padding:4px 6px}
+  .lv-c{gap:6px}
+  .ct{transform:scale(1.1);transform-origin:bottom center;margin:2px}
+  .ct-lb{font-size:10px}
+  .pn{width:100%;max-height:50vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
+  .pb{padding:10px 12px}
+  .tbtn{font-size:13px;padding:8px 2px}
+  .tooltip{max-width:220px;font-size:12px}
+  .ic-n{font-size:16px}
+  .ir-k{flex:0 0 68px;font-size:12px}
+  .ir-v{font-size:13px}
+  .fd input,.fd select,.fd textarea{font-size:14px;padding:8px}
+  .szb{padding:6px 10px}
+  .btn{padding:7px 12px}
+  .ia{gap:6px}
+  .ia .btn{flex:1;text-align:center}
+  .empty{font-size:13px;padding:16px 8px}
+}
 </style>
 </head>
 <body>
@@ -334,24 +366,27 @@ function render(){
   document.getElementById('fs-l').addEventListener('change',e=>{S.fl=e.target.value;render()});
   document.getElementById('fs-s').addEventListener('change',e=>{S.fs=e.target.value;render()});
   if(siF&&nsi){nsi.focus();if(siP!==null)nsi.setSelectionRange(siP,siP)}
-  // Hover tooltip
+  // Tooltip: hover on desktop, tap on mobile
+  const isMob='ontouchstart'in window||navigator.maxTouchPoints>0;
+  function showTip(el){
+    const cid=el.dataset.cid;if(!cid)return;const f=findC(cid);if(!f)return;const{c,l}=f;
+    const t=TYPES[c.type]||{l:'?'};const tt=document.getElementById('tooltip');
+    let h=`<div class="tt-n">${esc(c.label||'未命名')}</div><div class="tt-m">${t.l} · ${SL[c.size]||'中'} · ${esc(l.label)}</div>`;
+    if(c.location)h+=`<div class="tt-r"><span class="tt-k">地点</span><span class="tt-v">${esc(c.location)}</span></div>`;
+    if(c.treatment)h+=`<div class="tt-r"><span class="tt-k">处理</span><span class="tt-v">${esc(c.treatment)}</span></div>`;
+    if(c.samplingDate)h+=`<div class="tt-r"><span class="tt-k">采样</span><span class="tt-v">${esc(c.samplingDate)}</span></div>`;
+    if(c.person)h+=`<div class="tt-r"><span class="tt-k">负责人</span><span class="tt-v">${esc(c.person)}</span></div>`;
+    if(c.notes)h+=`<div class="tt-r"><span class="tt-k">备注</span><span class="tt-v">${esc(c.notes)}</span></div>`;
+    tt.innerHTML=h;tt.style.display='block';
+    const r=el.getBoundingClientRect();
+    tt.style.left=Math.max(8,Math.min(r.left,window.innerWidth-240))+'px';
+    const below=r.bottom+8;tt.style.top=(below>window.innerHeight-120?r.top-tt.offsetHeight-8:below)+'px';
+  }
   document.querySelectorAll('.ct').forEach(el=>{
-    el.addEventListener('mouseenter',e=>{
-      const cid=el.dataset.cid;if(!cid)return;const f=findC(cid);if(!f)return;const{c,l}=f;
-      const t=TYPES[c.type]||{l:'?'};const tt=document.getElementById('tooltip');
-      let h=`<div class="tt-n">${esc(c.label||'未命名')}</div><div class="tt-m">${t.l} · ${SL[c.size]||'中'} · ${esc(l.label)}</div>`;
-      if(c.location)h+=`<div class="tt-r"><span class="tt-k">地点</span><span class="tt-v">${esc(c.location)}</span></div>`;
-      if(c.treatment)h+=`<div class="tt-r"><span class="tt-k">处理</span><span class="tt-v">${esc(c.treatment)}</span></div>`;
-      if(c.samplingDate)h+=`<div class="tt-r"><span class="tt-k">采样</span><span class="tt-v">${esc(c.samplingDate)}</span></div>`;
-      if(c.person)h+=`<div class="tt-r"><span class="tt-k">负责人</span><span class="tt-v">${esc(c.person)}</span></div>`;
-      if(c.notes)h+=`<div class="tt-r"><span class="tt-k">备注</span><span class="tt-v">${esc(c.notes)}</span></div>`;
-      tt.innerHTML=h;tt.style.display='block';
-      const r=el.getBoundingClientRect();
-      tt.style.left=Math.min(r.left,window.innerWidth-290)+'px';
-      tt.style.top=(r.bottom+8)+'px';
-    });
-    el.addEventListener('mouseleave',()=>{document.getElementById('tooltip').style.display='none'});
+    if(isMob){el.addEventListener('touchstart',e=>{e.stopPropagation();showTip(el)},{passive:true})}
+    else{el.addEventListener('mouseenter',()=>showTip(el));el.addEventListener('mouseleave',()=>{document.getElementById('tooltip').style.display='none'})}
   });
+  if(isMob)document.addEventListener('touchstart',()=>{document.getElementById('tooltip').style.display='none'},{passive:true});
 }
 
 function renderShelfOnly(){doSearch();const hs=S.sq||S.ft||S.fl||S.fs;document.querySelectorAll('.ct').forEach(el=>{const cid=el.dataset.cid;if(!cid)return;el.classList.toggle('srhit',hs&&S.hits.includes(cid));el.classList.toggle('dim',hs&&!S.hits.includes(cid))})}
