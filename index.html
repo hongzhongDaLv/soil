@@ -319,7 +319,7 @@ const INIT4={id:'shelf4',name:'架2',levels:[
   ]},
 ]};
 
-let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null};
+let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null,showTip:false};
 Object.defineProperty(S,'shelf',{get(){return S.shelves?S.shelves[S.shelfIdx]:null}});
 function save(){try{localStorage.setItem('sv7-s',JSON.stringify(S.shelves));localStorage.setItem('sv7-l',JSON.stringify(S.log));localStorage.setItem('sv7-h',JSON.stringify(S.hist))}catch{}}
 function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))]}
@@ -348,7 +348,7 @@ function render(){
     if(li<S.shelf.levels.length-1)shelfH+='<div class="sb"></div>';
   });
   document.getElementById('app').innerHTML=`
-    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">v7</span><div class="hdr-r"><button class="btn bp" onclick="cloudSync()">☁ 复制链接</button><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button><button class="btn bg" onclick="importD()">导入↑</button><button class="btn bg" onclick="resetAll()">↺</button></div></div>
+    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">v7</span><div class="hdr-r"><button class="btn bp" onclick="cloudSync()">☁ 复制链接</button><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✓':'悬浮✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button><button class="btn bg" onclick="importD()">导入↑</button><button class="btn bg" onclick="resetAll()">↺</button></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
       <select class="fsel" id="fs-t"><option value="">全部类型</option>${Object.keys(TYPES).map(k=>`<option value="${k}" ${S.ft===k?'selected':''}>${TYPES[k].l}</option>`).join('')}</select>
       <select class="fsel" id="fs-l"><option value="">全部地点</option>${getLocs().map(l=>`<option value="${esc(l)}" ${S.fl===l?'selected':''}>${esc(l)}</option>`).join('')}</select>
@@ -370,7 +370,7 @@ function render(){
   // Tooltip: hover on desktop, tap on mobile
   const isMob='ontouchstart'in window||navigator.maxTouchPoints>0;
   function showTip(el){
-    if(S.moveMode||S.stkMode)return;
+    if(S.moveMode||S.stkMode||!S.showTip)return;
     const cid=el.dataset.cid;if(!cid)return;const f=findC(cid);if(!f)return;const{c,l}=f;
     const t=TYPES[c.type]||{l:'?'};const tt=document.getElementById('tooltip');
     let h=`<div class="tt-n">${esc(c.label||'未命名')}</div><div class="tt-m">${t.l} · ${SL[c.size]||'中'} · ${esc(l.label)}</div>`;
@@ -415,7 +415,7 @@ function renderCtn(c,lv,ci,hs){
   const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':''].filter(Boolean).join(' ');
   const cm=c.color||'#999',cd=dk(cm),cl=lt(cm);
   const fn=S.stkMode?`event.stopPropagation();stkTarget('${c.id}')`:S.moveMode?`event.stopPropagation();moveTap('${c.id}','${lv.id}')`:`selC('${c.id}')`;
-  return `<div class="${cls}" style="width:${sz.w}px" data-cid="${c.id}" draggable="true" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
+  return `<div class="${cls}" style="width:${sz.w}px" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
     ${ctnTop(c)}
     <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}<div class="ct-sti s${c.status||'在库'}"></div></div>
     <div class="ct-lb" style="width:${sz.w}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div></div>`;
@@ -426,11 +426,11 @@ function renderStack(base,top,lv,hs){
   const selB=S.sel===base.id,selT=S.sel===top.id,hitB=S.hits.includes(base.id),hitT=S.hits.includes(top.id),dim=hs&&!hitB&&!hitT;
   const fnB=S.stkMode?`event.stopPropagation();stkTarget('${base.id}')`:S.moveMode?`event.stopPropagation();moveTap('${base.id}','${lv.id}')`:`selC('${base.id}')`,fnT=S.stkMode?`event.stopPropagation();stkTarget('${top.id}')`:S.moveMode?`event.stopPropagation();moveTap('${top.id}','${lv.id}')`:`selC('${top.id}')`;
   return `<div class="stkg${dim?' dim':''}" style="width:${w}px" data-cid="${base.id}">
-    <div class="ct ct-top${selT?' sel':''}${hitT?' srhit':''}" style="width:${szT.w}px" data-cid="${top.id}" onclick="event.stopPropagation();${fnT}" draggable="true" ondragstart="dragS(event,'${top.id}','${lv.id}')">
+    <div class="ct ct-top${selT?' sel':''}${hitT?' srhit':''}" style="width:${szT.w}px" data-cid="${top.id}" onclick="event.stopPropagation();${fnT}" draggable="${S.moveMode}" ondragstart="dragS(event,'${top.id}','${lv.id}')">
       ${ctnTop(top)}
       <div class="ct-b ${top.vis||top.type}" style="height:${szT.h}px;--cm:${cmT};--cd:${cdT};--cl:${clT}">${ctnInner(top)}<div class="ct-sti s${top.status||'在库'}"></div><div class="stk-badge">上</div></div>
       <div class="ct-lb" style="width:${szT.w}px">${esc(top.label.length>7?top.label.slice(0,6)+'…':top.label)}</div></div>
-    <div class="ct ct-bot${selB?' sel':''}${hitB?' srhit':''}" style="width:${szB.w}px" data-cid="${base.id}" onclick="event.stopPropagation();${fnB}" draggable="true" ondragstart="dragS(event,'${base.id}','${lv.id}')">
+    <div class="ct ct-bot${selB?' sel':''}${hitB?' srhit':''}" style="width:${szB.w}px" data-cid="${base.id}" onclick="event.stopPropagation();${fnB}" draggable="${S.moveMode}" ondragstart="dragS(event,'${base.id}','${lv.id}')">
       ${ctnTop(base)}
       <div class="ct-b ${base.vis||base.type}" style="height:${szB.h}px;--cm:${cmB};--cd:${cdB};--cl:${clB}">${ctnInner(base)}<div class="ct-sti s${base.status||'在库'}"></div><div class="stk-badge">下</div></div>
       <div class="ct-lb" style="width:${szB.w}px">${esc(base.label.length>7?base.label.slice(0,6)+'…':base.label)}</div></div></div>`;
@@ -511,12 +511,13 @@ window.enterStk=id=>{S.stkMode=true;S.sel=id;render();toast('点击目标容器'
 window.cancelStk=()=>{S.stkMode=false;render()};
 window.stkTarget=tid=>{if(!S.stkMode||!S.sel||S.sel===tid)return;const src=findC(S.sel),tgt=findC(tid);if(!src||!tgt)return;if(src.l.id!==tgt.l.id){toast('只能叠放同层容器');return}if(getChildOf(tid)){toast('目标已有叠放');return}if(getChildOf(S.sel)){toast('请先取消已有叠放');return}src.c.stackParent=tid;commit('叠放',src.c.label+' → '+tgt.c.label+'上');S.stkMode=false;render()};
 window.unstack=id=>{const f=findC(id);if(!f)return;f.c.stackParent=null;commit('取消叠放',f.c.label);render()};
-window.dragS=(e,cid,lv)=>{S.dcid=cid;S.dlv=lv;e.dataTransfer.effectAllowed='move'};
+window.dragS=(e,cid,lv)=>{if(!S.moveMode){e.preventDefault();return}S.dcid=cid;S.dlv=lv;e.dataTransfer.effectAllowed='move'};
 window.onDrop=(e,tlv,ti)=>{e.preventDefault();if(!S.dcid)return;const fl=S.shelf.levels.find(l=>l.id===S.dlv),tl=S.shelf.levels.find(l=>l.id===tlv);if(!fl||!tl)return;const ci=fl.containers.findIndex(x=>x.id===S.dcid);if(ci<0)return;const[item]=fl.containers.splice(ci,1);if(S.dlv!==tlv){item.stackParent=null;fl.containers.forEach(x=>{if(x.stackParent===item.id)x.stackParent=null})}tl.containers.splice(Math.min(ti,tl.containers.length),0,item);if(S.dlv===tlv)commit('移动',item.label+' 层内重排');else commit('移动',item.label+'：'+fl.label+' → '+tl.label);S.dcid=null;S.dlv=null;render()};
 window.togH=i=>{S.hidx=S.hidx===i?null:i;render()};
 window.restH=i=>{const h=S.hist[i];if(!h||!confirm('恢复到 '+h.t+'？'))return;S.shelves=JSON.parse(JSON.stringify(h.s));commit('恢复','→ '+h.t);S.hidx=null;render()};
 window.switchShelf=i=>{S.shelfIdx=i;S.sel=null;S.editing=false;S.adding=null;S.stkMode=false;render()};
 window.togLabels=()=>{S.showLabels=!S.showLabels;render()};
+window.togTip=()=>{S.showTip=!S.showTip;render()};
 window.showTable=()=>{
   const hdr=['架','层','标签','类型','地点','经纬度','处理/添加','添加量','采样深度','添加日期','采样日期','负责人','备注','状态'];
   let rows=[hdr.join(',')];
