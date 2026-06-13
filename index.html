@@ -22,6 +22,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .hdr-b{font-size:10px;background:#e8f0f8;color:var(--acc);padding:1px 8px;border:1px solid #c0d4e8;border-radius:10px}
 .hdr-r{margin-left:auto;display:flex;gap:6px}
 .sbar{display:flex;align-items:center;gap:8px;padding:6px 16px;background:var(--sf);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.fpn{display:flex;flex-wrap:wrap;gap:6px 16px;padding:6px 16px;background:var(--sf2);border-bottom:1px solid var(--bd);align-items:center}
+.frow{display:flex;align-items:center;gap:4px}.flb{font-size:12px;color:var(--mt);min-width:30px}
 .sbar-w{flex:1;min-width:200px}
 #si{width:100%;padding:7px 12px;background:var(--sf2);border:2px solid var(--bd);color:var(--txt);font-size:15px;outline:none;border-radius:8px;box-shadow:inset 0 1px 3px #0001}
 #si:focus{border-color:var(--acc)}#si::placeholder{color:#b0b8c4}
@@ -333,7 +335,7 @@ const INIT4={id:'shelf4',name:'架2',levels:[
   ]},
 ]};
 
-let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',ftr:'',df:'',dt:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null,showTip:true};
+let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',ftr:'',df:'',dt:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null,showTip:true,showFilter:false};
 Object.defineProperty(S,'shelf',{get(){return S.shelves?S.shelves[S.shelfIdx]:null}});
 function save(){try{localStorage.setItem('sv7-s',JSON.stringify(S.shelves));localStorage.setItem('sv7-l',JSON.stringify(S.log));localStorage.setItem('sv7-h',JSON.stringify(S.hist))}catch{}}
 function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))]}
@@ -376,14 +378,14 @@ function render(){
   document.getElementById('app').innerHTML=`
     <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.2</span><div class="hdr-r"><span id="save-status" class="btn bp" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✓':'悬浮✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
-      <select class="fsel" id="fs-t"><option value="">全部类型</option>${Object.keys(TYPES).map(k=>`<option value="${k}" ${S.ft===k?'selected':''}>${TYPES[k].l}</option>`).join('')}</select>
-      <select class="fsel" id="fs-l"><option value="">全部地点</option>${getLocs().map(l=>`<option value="${esc(l)}" ${S.fl===l?'selected':''}>${esc(l)}</option>`).join('')}</select>
-      <select class="fsel" id="fs-tr"><option value="">全部处理</option>${getTreats().map(t=>`<option value="${esc(t)}" ${S.ftr===t?'selected':''}>${esc(t)}</option>`).join('')}</select>
-      <span style="font-size:11px;color:var(--mt)">采样</span>
-      <span class="dt-wrap"><input class="fsel dt-in" id="fs-df" type="date" value="${esc(S.df)}"><button class="dt-btn" onclick="S.df='';render()">最早</button></span>
-      <span style="font-size:11px;color:var(--mt)">~</span>
-      <span class="dt-wrap"><input class="fsel dt-in" id="fs-dt" type="date" value="${esc(S.dt)}"><button class="dt-btn" onclick="S.dt=new Date().toISOString().slice(0,10);render()">至今</button></span>
-      ${hs?`<span class="scnt">${S.hits.length}项</span><button class="btn bg" style="padding:3px 10px;font-size:12px" onclick="clearSr()">清除</button>`:''}</div>
+      <button class="btn ${S.showFilter||hs?'bor':'bg'}" onclick="togFilter()" style="font-size:12px">${hs?'筛选('+S.hits.length+')':'⊞ 筛选'}</button>
+      ${hs?`<button class="btn bg" style="padding:3px 8px;font-size:11px" onclick="clearSr()">✕</button>`:''}</div>
+    ${S.showFilter?`<div class="fpn">
+      <div class="frow"><span class="flb">类型</span><select class="fsel" id="fs-t"><option value="">全部</option>${Object.keys(TYPES).map(k=>`<option value="${k}" ${S.ft===k?'selected':''}>${TYPES[k].l}</option>`).join('')}</select></div>
+      <div class="frow"><span class="flb">地点</span><select class="fsel" id="fs-l"><option value="">全部</option>${getLocs().map(l=>`<option value="${esc(l)}" ${S.fl===l?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+      <div class="frow"><span class="flb">处理</span><select class="fsel" id="fs-tr"><option value="">全部</option>${getTreats().map(t=>`<option value="${esc(t)}" ${S.ftr===t?'selected':''}>${esc(t)}</option>`).join('')}</select></div>
+      <div class="frow"><span class="flb">采样</span><span class="dt-wrap"><input class="fsel dt-in" id="fs-df" type="date" value="${esc(S.df)}"><button class="dt-btn" onclick="S.df='';render()">最早</button></span><span style="margin:0 4px;color:var(--mt)">~</span><span class="dt-wrap"><input class="fsel dt-in" id="fs-dt" type="date" value="${esc(S.dt)}"><button class="dt-btn" onclick="S.dt=new Date().toISOString().slice(0,10);render()">至今</button></span></div>
+    </div>`:''}
     <div class="main"><div class="sa"><div class="st"><span style="color:var(--acc)">⊞</span>${S.shelves.map((sh,i)=>`<button class="btn ${i===S.shelfIdx?'bp':'bg'}" style="padding:3px 12px;font-size:13px" onclick="switchShelf(${i})">${esc(sh.name)}</button>`).join('')}<span class="st-n">${allC().length}个</span><button class="btn ${S.moveMode?'bor':'bg'}" style="padding:2px 8px;font-size:11px" onclick="togMove()">${S.moveMode?'移动中…':'✥移动'}</button>${S.stkMode?'<span style="color:var(--acc);font-size:12px;margin-left:4px">叠放→点目标</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="cancelStk()">取消</button>':''}${S.moveMode&&S.moveSrc?'<span style="color:#2a6ab0;font-size:12px">点击目标层</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="togMove()">取消</button>':''}</div>
       <div class="sf${S.showLabels?'':' hide-labels'}">${shelfH}<div class="sl"><div class="sleg"></div><div class="sleg"></div></div></div></div>
       <div class="pn"><div class="tb">${[['info','信息'],['edit','编辑'],['log','台账']].map(([k,v])=>`<button class="tbtn ${S.tab===k?'on':''}" onclick="stab('${k}')">${v}</button>`).join('')}</div><div class="pb">${renderPanel()}</div></div></div>
@@ -393,11 +395,11 @@ function render(){
   // Bind events
   const nsi=document.getElementById('si');
   nsi.addEventListener('input',e=>{S.sq=e.target.value;renderShelfOnly()});
-  document.getElementById('fs-t').addEventListener('change',e=>{S.ft=e.target.value;render()});
-  document.getElementById('fs-l').addEventListener('change',e=>{S.fl=e.target.value;render()});
-  document.getElementById('fs-tr').addEventListener('change',e=>{S.ftr=e.target.value;render()});
-  document.getElementById('fs-df').addEventListener('change',e=>{S.df=e.target.value;render()});
-  document.getElementById('fs-dt').addEventListener('change',e=>{S.dt=e.target.value;render()});
+  document.getElementById('fs-t')?.addEventListener('change',e=>{S.ft=e.target.value;render()});
+  document.getElementById('fs-l')?.addEventListener('change',e=>{S.fl=e.target.value;render()});
+  document.getElementById('fs-tr')?.addEventListener('change',e=>{S.ftr=e.target.value;render()});
+  document.getElementById('fs-df')?.addEventListener('change',e=>{S.df=e.target.value;render()});
+  document.getElementById('fs-dt')?.addEventListener('change',e=>{S.dt=e.target.value;render()});
   if(siF&&nsi){nsi.focus();if(siP!==null)nsi.setSelectionRange(siP,siP)}
   // Tooltip: hover on desktop, tap on mobile
   const isMob='ontouchstart'in window||navigator.maxTouchPoints>0;
@@ -700,6 +702,7 @@ window.restH=i=>{
 window.switchShelf=i=>{S.shelfIdx=i;S.sel=null;S.editing=false;S.adding=null;S.stkMode=false;render()};
 window.togLabels=()=>{S.showLabels=!S.showLabels;render()};
 window.togTip=()=>{S.showTip=!S.showTip;render()};
+window.togFilter=()=>{S.showFilter=!S.showFilter;render()};
 window.showTable=()=>{
   const hdr=['来源','地点','经纬度','添加物','添加量','添加日期','采样日期','负责人','相对位置','容器类型','深度','备注','状态'];
   let rows=[hdr.join(',')];
@@ -791,7 +794,14 @@ window.checkLogPwd=()=>{
 };
 // 每60秒静默拉取（GitHub API有速率限制，不宜太频繁）
 setInterval(()=>{cloudPull().then(ok=>{if(ok)render()})},60000);
-window.resetAll=()=>{if(!confirm('重置所有数据？此操作不可撤回。'))return;S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];S.shelfIdx=0;S.log=[];S.hist=[];S.sel=null;save();render();cloudPush().then(ok=>{toast(ok?'已重置并同步':'已重置（同步失败）')})};
+window.resetAll=async()=>{if(!confirm('重置所有数据？此操作不可撤回。'))return;
+  S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];
+  S.shelfIdx=0;S.log=[];S.hist=[];S.sel=null;save();render();
+  // Re-fetch SHA to avoid conflict
+  try{const r=await fetch(GH_API,{headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}});if(r.ok){const d=await r.json();fileSha=d.sha}}catch{}
+  const ok=await cloudPush();
+  toast(ok?'已重置并同步到GitHub':'⚠ 重置了但同步失败，请点保存重试');render()
+};
 window.exportD=()=>{const d=JSON.stringify({shelves:S.shelves,log:S.log,hist:S.hist},null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='soil-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('已导出')};
 window.importD=()=>{const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.shelves){S.shelves=d.shelves;S.shelfIdx=0;if(d.log)S.log=d.log;if(d.hist)S.hist=d.hist;save();render();toast('已导入')}else if(d.shelf){S.shelves=[d.shelf];S.shelfIdx=0;save();render();toast('已导入(旧格式)')}else toast('格式错误')}catch{toast('解析失败')}};r.readAsText(f)};inp.click()};
 load();render();
