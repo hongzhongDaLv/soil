@@ -323,7 +323,8 @@ let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:
 Object.defineProperty(S,'shelf',{get(){return S.shelves?S.shelves[S.shelfIdx]:null}});
 function save(){try{localStorage.setItem('sv7-s',JSON.stringify(S.shelves));localStorage.setItem('sv7-l',JSON.stringify(S.log));localStorage.setItem('sv7-h',JSON.stringify(S.hist))}catch{}}
 function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))]}
-function commit(a,d){S.log=[{t:TS(),a,d},...S.log].slice(0,300);S.hist=[{t:TS(),s:JSON.parse(JSON.stringify(S.shelves))},...S.hist].slice(0,60);save();toast(a);if(cloudId)cloudPush()}
+let lastSaved='';
+function commit(a,d){S.log=[{t:TS(),a,d},...S.log].slice(0,300);S.hist=[{t:TS(),s:JSON.parse(JSON.stringify(S.shelves))},...S.hist].slice(0,60);save();cloudPush().then(ok=>{if(ok){lastSaved=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});const b=document.getElementById('save-status');if(b)b.textContent='☁ '+lastSaved+'已保存'}else{const b=document.getElementById('save-status');if(b)b.textContent='⚠ 保存失败'}})}
 function findC(id){for(const l of S.shelf.levels){const c=l.containers.find(x=>x.id===id);if(c)return{c,l}}return null}
 function allC(){const r=[];S.shelf.levels.forEach(l=>l.containers.forEach(c=>r.push({c,l})));return r}
 function getLocs(){const s=new Set();allC().forEach(({c})=>{if(c.location)s.add(c.location)});return[...s].sort()}
@@ -348,7 +349,7 @@ function render(){
     if(li<S.shelf.levels.length-1)shelfH+='<div class="sb"></div>';
   });
   document.getElementById('app').innerHTML=`
-    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.0</span><div class="hdr-r"><button class="btn bp" onclick="manualSave()">☁保存</button><button class="btn bg" onclick="cloudSync()">复制链接</button><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✓':'悬浮✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button><button class="btn bg" onclick="importD()">导入↑</button><button class="btn bg" onclick="resetAll()">↺</button></div></div>
+    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.0</span><div class="hdr-r"><span id="save-status" class="btn bp" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn bg" onclick="cloudSync()">复制链接</button><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✓':'悬浮✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button><button class="btn bg" onclick="importD()">导入↑</button></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
       <select class="fsel" id="fs-t"><option value="">全部类型</option>${Object.keys(TYPES).map(k=>`<option value="${k}" ${S.ft===k?'selected':''}>${TYPES[k].l}</option>`).join('')}</select>
       <select class="fsel" id="fs-l"><option value="">全部地点</option>${getLocs().map(l=>`<option value="${esc(l)}" ${S.fl===l?'selected':''}>${esc(l)}</option>`).join('')}</select>
@@ -357,7 +358,7 @@ function render(){
     <div class="main"><div class="sa"><div class="st"><span style="color:var(--acc)">⊞</span>${S.shelves.map((sh,i)=>`<button class="btn ${i===S.shelfIdx?'bp':'bg'}" style="padding:3px 12px;font-size:13px" onclick="switchShelf(${i})">${esc(sh.name)}</button>`).join('')}<span class="st-n">${allC().length}个</span><button class="btn ${S.moveMode?'bor':'bg'}" style="padding:2px 8px;font-size:11px" onclick="togMove()">${S.moveMode?'移动中…':'✥移动'}</button>${S.stkMode?'<span style="color:var(--acc);font-size:12px;margin-left:4px">叠放→点目标</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="cancelStk()">取消</button>':''}${S.moveMode&&S.moveSrc?'<span style="color:#2a6ab0;font-size:12px">点击目标层</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="togMove()">取消</button>':''}</div>
       <div class="sf${S.showLabels?'':' hide-labels'}">${shelfH}<div class="sl"><div class="sleg"></div><div class="sleg"></div></div></div></div>
       <div class="pn"><div class="tb">${[['info','信息'],['edit','编辑'],['log','台账']].map(([k,v])=>`<button class="tbtn ${S.tab===k?'on':''}" onclick="stab('${k}')">${v}</button>`).join('')}</div><div class="pb">${renderPanel()}</div></div></div>
-    <div class="ftr">☁ 数据存储：GitHub/${GH_REPO}/data.json · 自动同步</div>
+    <div class="ftr">数据：GitHub/data.json（主） + 浏览器缓存（备） · 编辑自动保存</div>
     <div class="toast" id="toast" style="display:none"></div>
     <div class="tooltip" id="tooltip" style="display:none"></div>`;
   // Bind events
@@ -556,9 +557,20 @@ function renderPanel(){
       <div style="display:flex;gap:8px;margin-top:10px"><button class="btn bp" onclick="saveEd()">${S.adding?'✓ 添加':'✓ 保存'}</button><button class="btn bg" onclick="cancelEd()">取消</button></div></div>`;
   }
   if(S.tab==='log'){
-    let h='';
-    if(S.hist.length>1)h+=`<div style="margin-bottom:10px"><button class="btn bor" onclick="undo()" style="width:100%">↩ 撤回上一步</button></div>`;
-    if(!S.log.length)return '<div class="empty">暂无操作记录</div>';
+    // 每日密码验证
+    const today=new Date().toDateString();
+    const authed=localStorage.getItem('log-auth')===today;
+    if(!authed){
+      return `<div class="empty" style="padding:40px 20px">
+        <div style="font-size:16px;margin-bottom:12px">🔒 台账需要验证</div>
+        <input id="log-pwd" type="password" placeholder="输入密码" style="padding:8px 12px;border:2px solid var(--bd);border-radius:8px;font-size:14px;width:160px;text-align:center">
+        <br><button class="btn bp" style="margin-top:10px" onclick="checkLogPwd()">确认</button>
+      </div>`;
+    }
+    let h='<div style="display:flex;gap:6px;margin-bottom:10px">';
+    if(S.hist.length>1)h+=`<button class="btn bor" onclick="undo()" style="flex:1">↩ 撤回上一步</button>`;
+    h+=`<button class="btn bd" onclick="resetAll()" style="padding:4px 10px;font-size:11px">↺ 重置系统</button></div>`;
+    if(!S.log.length)return h+'<div class="empty">暂无操作记录</div>';
     h+=S.log.map((e,i)=>`<div class="li" style="flex-wrap:wrap">
       <span class="li-t">${esc(e.t)}</span>
       <span class="li-a">${esc(e.a)}</span>
@@ -683,25 +695,38 @@ async function cloudPush(){
   }catch(e){console.warn('push',e);cloudBusy=false;return false}
 }
 
-// 页面加载：从GitHub拉数据
+// 数据策略：GitHub为主，localStorage为备份
 (async function(){
+  // 1. 尝试从GitHub拉取
   const ok=await cloudPull();
-  if(ok){render();toast('☁ 数据已从GitHub加载')}
-  else{
-    // GitHub上还没有data.json，推送初始数据
-    S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];
-    save();render();
-    const pushed=await cloudPush();
-    if(pushed)toast('☁ 初始数据已推送到GitHub');
-    else toast('⚠ 推送失败');
+  if(ok){
+    render();
+    lastSaved=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+    toast('☁ 数据已加载');
+    return;
   }
+  // 2. GitHub失败 → 用localStorage缓存（离线备份）
+  if(S.shelves&&S.shelves.length>0&&S.shelves.some(sh=>sh.levels.some(l=>l.containers.length>0))){
+    render();toast('⚠ 离线模式，使用本地缓存');return;
+  }
+  // 3. 都没有 → 用初始数据，推送到GitHub
+  S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];
+  save();render();
+  const pushed=await cloudPush();
+  toast(pushed?'☁ 初始数据已上传':'⚠ 使用本地数据');
 })();
 
 window.cloudSync=()=>{navigator.clipboard?.writeText(location.href);toast('链接已复制')};
 window.manualSave=async()=>{
-  toast('保存中…');
+  const b=document.getElementById('save-status');if(b)b.textContent='保存中…';
   const ok=await cloudPush();
-  toast(ok?'☁ 已保存到GitHub':'⚠ 保存失败');
+  if(ok){lastSaved=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});if(b)b.textContent='☁ '+lastSaved+'已保存'}
+  else{if(b)b.textContent='⚠ 失败'}
+};
+window.checkLogPwd=()=>{
+  const v=document.getElementById('log-pwd')?.value;
+  if(v==='456456456'){localStorage.setItem('log-auth',new Date().toDateString());render();toast('验证通过')}
+  else{toast('密码错误')}
 };
 // 每60秒静默拉取（GitHub API有速率限制，不宜太频繁）
 setInterval(()=>{cloudPull().then(ok=>{if(ok)render()})},60000);
