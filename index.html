@@ -54,7 +54,11 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ct-lb{font-size:11px;color:#444;text-align:center;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.3;font-weight:500;background:rgba(255,255,255,.92);border-radius:4px;padding:1px 4px;position:relative;z-index:5;box-shadow:0 1px 2px #0001}
 .dpb{position:absolute;top:1px;right:1px;background:#2a6ab0;color:#fff;font-size:7px;padding:0 3px;border-radius:2px;line-height:1.5;z-index:2}
 .ct{position:relative;z-index:1}
-.ct-deep{z-index:0;opacity:0.5}
+
+.dp-group{position:relative;flex-shrink:0}
+.dpbadge{position:absolute;top:-6px;right:-6px;background:#2a6ab0;color:#fff;width:20px;height:20px;border-radius:50%;font-size:10px;text-align:center;line-height:20px;cursor:pointer;z-index:10;border:2px solid var(--sf);font-weight:500;transition:transform .15s}
+.dpbadge:hover{transform:scale(1.15)}
+.dp-expand{position:absolute;top:100%;left:0;margin-top:6px;border:2px dashed var(--acc);border-radius:10px;padding:8px;background:var(--sf);z-index:20;display:flex;gap:6px;box-shadow:0 4px 16px #0002;min-width:max-content}
 
 .ct-sti{position:absolute;top:2px;right:2px;width:7px;height:7px;border:1px solid #fff8;border-radius:50%}
 .ct-sti.s在库{background:#2a9a4a}.ct-sti.s已取出{background:#c0a020}.ct-sti.s已用完{background:#c04040}.ct-sti.s待处理{background:#3070b0}
@@ -241,8 +245,8 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 // ===== INITIAL DATA =====
 const INIT={id:'shelf1',name:'架3',levels:[
   {id:'L1',label:'第一层',containers:[
-    {id:'r1c1',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'DCS',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'DCS',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'袋装土样',notes:'',status:'在库',stackParent:null},
-    {id:'r1c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'韩兰芳',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'HLF',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'袋装土样',notes:'',status:'在库',stackParent:null},
+    {id:'r1c1',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'DCS',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'袋装土样',notes:'',status:'在库',stackParent:null},
+    {id:'r1c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'韩兰芳',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'袋装土样',notes:'',status:'在库',stackParent:null},
     {id:'r1c3',type:'plastic_bin',vis:'transparent_box',color:'#b8d8ea',size:'l',label:'1-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null},
     {id:'r1c4',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'1-4',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null},
     {id:'r1c5',type:'plastic_bin',color:'#4a9a8a',size:'m',label:'九三垦区',source:'',location:'九三垦区',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'青绿色收纳筐',status:'在库',stackParent:null},
@@ -335,14 +339,15 @@ const INIT4={id:'shelf4',name:'架2',levels:[
   ]},
 ]};
 
-let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',ftr:'',df:'',dt:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null,showTip:true,showFilter:false};
+let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',ftr:'',df:'',dt:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null,showTip:true,showFilter:false,depthOpen:[]};
 Object.defineProperty(S,'shelf',{get(){return S.shelves?S.shelves[S.shelfIdx]:null}});
 function save(){try{localStorage.setItem('sv7-s',JSON.stringify(S.shelves));localStorage.setItem('sv7-l',JSON.stringify(S.log));localStorage.setItem('sv7-h',JSON.stringify(S.hist))}catch{}}
 function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))]}
 let lastSaved='';
 function commit(a,d){S.log=[{t:TS(),a,d},...S.log].slice(0,300);S.hist=[{t:TS(),s:JSON.parse(JSON.stringify(S.shelves))},...S.hist].slice(0,60);save();cloudPush().then(ok=>{if(ok){lastSaved=new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});const b=document.getElementById('save-status');if(b)b.textContent='☁ '+lastSaved+'已保存'}else{const b=document.getElementById('save-status');if(b)b.textContent='⚠ 保存失败'}})}
 function findC(id){for(const l of S.shelf.levels){const c=l.containers.find(x=>x.id===id);if(c)return{c,l}}return null}
-function allC(){const r=[];S.shelf.levels.forEach(l=>l.containers.forEach(c=>r.push({c,l})));return r}
+function allC(){const r=[];S.shelves.forEach((sh,si)=>sh.levels.forEach(l=>l.containers.forEach(c=>r.push({c,l,si}))));return r}
+function shelfHits(si){return S.hits.filter(id=>{const sh=S.shelves[si];return sh.levels.some(l=>l.containers.some(c=>c.id===id))}).length}
 function getLocs(){const s=new Set();allC().forEach(({c})=>{if(c.location)s.add(c.location)});return[...s].sort()}
 function getTreats(){const s=new Set();allC().forEach(({c})=>{if(c.treatment)s.add(c.treatment)});return[...s].sort()}
 function getChildOf(pid){for(const l of S.shelf.levels){const c=l.containers.find(x=>x.stackParent===pid);if(c)return{c,l}}return null}
@@ -354,15 +359,26 @@ function render(){
   // Save scroll positions
   const saEl=document.querySelector('.sa'),saTop=saEl?saEl.scrollTop:0;
   const lvScrolls={};document.querySelectorAll('.lv-c').forEach(el=>{if(el.dataset.lv)lvScrolls[el.dataset.lv]=el.scrollLeft});
-  doSearch();const hs=S.sq||S.ft||S.fl||S.fs;
+  doSearch();const hs=S.sq||S.ft||S.fl||S.fs||S.ftr||S.df||S.dt;
   const si=document.getElementById('si'),siP=si?si.selectionStart:null,siF=si&&document.activeElement===si;
   let shelfH='';
   S.shelf.levels.forEach((lv,li)=>{
     let ch='';const done=new Set();
-    lv.containers.forEach((c,ci)=>{if(done.has(c.id)||c.stackParent)return;
+    lv.containers.forEach((c,ci)=>{if(done.has(c.id)||c.stackParent||c.depthParent)return;
       const child=lv.containers.find(x=>x.stackParent===c.id);
       if(child){done.add(c.id);done.add(child.id);ch+=renderStack(c,child,lv,hs)}
-      else{done.add(c.id);ch+=renderCtn(c,lv,ci,hs)}
+      else{
+        done.add(c.id);
+        const behinds=lv.containers.filter(x=>x.depthParent===c.id);
+        behinds.forEach(b=>done.add(b.id));
+        if(behinds.length){
+          const searchHit=hs&&behinds.some(b=>S.hits.includes(b.id));
+          const isOpen=S.depthOpen.includes(c.id)||searchHit;
+          const badge=`<div class="dpbadge" onclick="event.stopPropagation();togDepth('${c.id}')">+${behinds.length}</div>`;
+          const expand=isOpen?`<div class="dp-expand">${behinds.map(b=>renderCtn(b,lv,0,hs)).join('')}</div>`:'';
+          ch+=`<div class="dp-group">${renderCtn(c,lv,ci,hs)}${badge}${expand}</div>`;
+        }else{ch+=renderCtn(c,lv,ci,hs)}
+      }
     });
     lv.containers.forEach(c=>{if(!done.has(c.id)){done.add(c.id);ch+=renderCtn(c,lv,0,hs)}});
     shelfH+=`<div class="lv"><div class="lv-l">${esc(lv.label)}</div>
@@ -380,7 +396,7 @@ function render(){
       <div class="frow"><span class="flb">处理</span><select class="fsel" id="fs-tr"><option value="">全部</option>${getTreats().map(t=>`<option value="${esc(t)}" ${S.ftr===t?'selected':''}>${esc(t)}</option>`).join('')}</select></div>
       <div class="frow"><span class="flb">采样</span><span class="dt-wrap"><input class="fsel dt-in" id="fs-df" type="date" value="${esc(S.df)}"><button class="dt-btn" onclick="S.df='';render()">最早</button></span><span style="margin:0 4px;color:var(--mt)">~</span><span class="dt-wrap"><input class="fsel dt-in" id="fs-dt" type="date" value="${esc(S.dt)}"><button class="dt-btn" onclick="S.dt=new Date().toISOString().slice(0,10);render()">至今</button></span></div>
     </div>`:''}
-    <div class="main"><div class="sa"><div class="st"><span style="color:var(--acc)">⊞</span>${S.shelves.map((sh,i)=>`<button class="btn ${i===S.shelfIdx?'bp':'bg'}" style="padding:3px 12px;font-size:13px" onclick="switchShelf(${i})">${esc(sh.name)}</button>`).join('')}<span class="st-n">${allC().length}个</span><button class="btn ${S.moveMode?'bor':'bg'}" style="padding:2px 8px;font-size:11px" onclick="togMove()">${S.moveMode?'移动中…':'✥移动'}</button>${S.stkMode?'<span style="color:var(--acc);font-size:12px;margin-left:4px">叠放→点目标</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="cancelStk()">取消</button>':''}${S.moveMode&&S.moveSrc?'<span style="color:#2a6ab0;font-size:12px">点击目标层</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="togMove()">取消</button>':''}</div>
+    <div class="main"><div class="sa"><div class="st"><span style="color:var(--acc)">⊞</span>${S.shelves.map((sh,i)=>{const hc=hs?shelfHits(i):0;return`<button class="btn ${i===S.shelfIdx?'bp':'bg'}" style="padding:3px 12px;font-size:13px" onclick="switchShelf(${i})">${esc(sh.name)}${hc?'<span style=\"font-size:10px;color:var(--acc);margin-left:2px\">('+hc+')</span>':''}</button>`}).join('')}<span class="st-n">${hs?S.hits.length+'命中':allC().length+'个'}</span><button class="btn ${S.moveMode?'bor':'bg'}" style="padding:2px 8px;font-size:11px" onclick="togMove()">${S.moveMode?'移动中…':'✥移动'}</button>${S.stkMode?'<span style="color:var(--acc);font-size:12px;margin-left:4px">叠放→点目标</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="cancelStk()">取消</button>':''}${S.moveMode&&S.moveSrc?'<span style="color:#2a6ab0;font-size:12px">点击目标层</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="togMove()">取消</button>':''}</div>
       <div class="sf${S.showLabels?'':' hide-labels'}">${shelfH}<div class="sl"><div class="sleg"></div><div class="sleg"></div></div></div></div>
       <div class="pn"><div class="tb">${[['info','信息'],['edit','编辑'],['log','台账']].map(([k,v])=>`<button class="tbtn ${S.tab===k?'on':''}" onclick="stab('${k}')">${v}</button>`).join('')}</div><div class="pb">${renderPanel()}</div></div></div>
     <div class="ftr">数据：GitHub/data.json（主） + 浏览器缓存（备） · 编辑自动保存</div>
@@ -516,7 +532,7 @@ function render(){
   setTimeout(()=>{const s=document.querySelector('.sa');if(s)s.scrollTop=saTop;document.querySelectorAll('.lv-c').forEach(el=>{if(el.dataset.lv&&lvScrolls[el.dataset.lv])el.scrollLeft=lvScrolls[el.dataset.lv]})},50);
 }
 
-function renderShelfOnly(){doSearch();const hs=S.sq||S.ft||S.fl||S.fs;document.querySelectorAll('.ct').forEach(el=>{const cid=el.dataset.cid;if(!cid)return;el.classList.toggle('srhit',hs&&S.hits.includes(cid));el.classList.toggle('dim',hs&&!S.hits.includes(cid))})}
+function renderShelfOnly(){doSearch();const hs=S.sq||S.ft||S.fl||S.fs||S.ftr||S.df||S.dt;document.querySelectorAll('.ct').forEach(el=>{const cid=el.dataset.cid;if(!cid)return;el.classList.toggle('srhit',hs&&S.hits.includes(cid));el.classList.toggle('dim',hs&&!S.hits.includes(cid))})}
 
 function ctnTop(c){
   const cm=c.color||'#999',cd=dk(cm);const vt=c.vis||c.type;
@@ -538,11 +554,10 @@ function ctnInner(c){
 function renderCtn(c,lv,ci,hs){
   const isDeep=(c.depth||0)>1;
   const sz=SZ[c.size]||SZ.m,sel=S.sel===c.id,hit=S.hits.includes(c.id),dim=hs&&!hit;
-  const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':'',isDeep?'ct-deep':''].filter(Boolean).join(' ');
+  const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':''].filter(Boolean).join(' ');
   const cm=c.color||'#999',cd=dk(cm),cl=lt(cm);
   const fn=S.stkMode?`event.stopPropagation();stkTarget('${c.id}')`:S.moveMode?`event.stopPropagation();moveTap('${c.id}','${lv.id}')`:`selC('${c.id}')`;
-  const ml=isDeep?-Math.round(sz.w*0.7):0;
-  return `<div class="${cls}" style="width:${sz.w}px${ml?';margin-left:'+ml+'px':''}" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
+  return `<div class="${cls}" style="width:${sz.w}px" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
     ${ctnTop(c)}
     <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}${isDeep?`<div class="dpb">${c.depth}</div>`:''}<div class="ct-sti s${c.status||'在库'}"></div></div>
     <div class="ct-lb" style="width:${sz.w}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div></div>`;
@@ -681,6 +696,7 @@ window.switchShelf=i=>{S.shelfIdx=i;S.sel=null;S.editing=false;S.adding=null;S.s
 window.togLabels=()=>{S.showLabels=!S.showLabels;render()};
 window.togTip=()=>{S.showTip=!S.showTip;render()};
 window.togFilter=()=>{S.showFilter=!S.showFilter;render()};
+window.togDepth=id=>{const i=S.depthOpen.indexOf(id);if(i>=0)S.depthOpen.splice(i,1);else S.depthOpen.push(id);render()};
 window.showTable=()=>{
   const hdr=['来源','地点','经纬度','添加物','添加量','添加日期','采样日期','负责人','相对位置','容器类型','深度','备注','状态'];
   let rows=[hdr.join(',')];
