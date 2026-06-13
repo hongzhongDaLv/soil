@@ -50,7 +50,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ct-lb{font-size:11px;color:#444;text-align:center;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.3;font-weight:500;background:rgba(255,255,255,.92);border-radius:4px;padding:1px 4px;position:relative;z-index:5;box-shadow:0 1px 2px #0001}
 .dpb{position:absolute;top:1px;right:1px;background:#2a6ab0;color:#fff;font-size:7px;padding:0 3px;border-radius:2px;line-height:1.5;z-index:2}
 .ct{position:relative;z-index:1}
-.ct-deep{z-index:0;opacity:0.5;margin-left:-55px}
+.ct-deep{z-index:0;opacity:0.5}
 .ct-sti{position:absolute;top:2px;right:2px;width:7px;height:7px;border:1px solid #fff8;border-radius:50%}
 .ct-sti.s在库{background:#2a9a4a}.ct-sti.s已取出{background:#c0a020}.ct-sti.s已用完{background:#c04040}.ct-sti.s待处理{background:#3070b0}
 
@@ -188,7 +188,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   #si{font-size:13px;padding:6px 8px}
   .fsel{font-size:11px;flex:1;min-width:0;padding:4px 4px}
   .main{flex-direction:column}
-  .sa{padding:4px 4px}
+  .sa{padding:4px 4px;align-items:flex-start}
   .sf{min-width:0;width:154%;transform:scale(0.65);transform-origin:top left;display:block;border-radius:4px;padding:1px 3px}
   .st{flex-wrap:wrap;gap:4px;font-size:13px;margin-bottom:4px}
   .st .btn{padding:3px 8px;font-size:11px}
@@ -521,7 +521,8 @@ function renderCtn(c,lv,ci,hs){
   const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':'',isDeep?'ct-deep':''].filter(Boolean).join(' ');
   const cm=c.color||'#999',cd=dk(cm),cl=lt(cm);
   const fn=S.stkMode?`event.stopPropagation();stkTarget('${c.id}')`:S.moveMode?`event.stopPropagation();moveTap('${c.id}','${lv.id}')`:`selC('${c.id}')`;
-  return `<div class="${cls}" style="width:${sz.w}px" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
+  const ml=isDeep?-Math.round(sz.w*0.7):0;
+  return `<div class="${cls}" style="width:${sz.w}px${ml?';margin-left:'+ml+'px':''}" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
     ${ctnTop(c)}
     <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}${isDeep?`<div class="dpb">${c.depth}</div>`:`<div class="ct-sti s${c.status||'在库'}"></div>`}</div>
     <div class="ct-lb" style="width:${sz.w}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div></div>`;
