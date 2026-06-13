@@ -49,7 +49,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ct-b{width:100%;position:relative;overflow:visible}
 .ct-lb{font-size:11px;color:#444;text-align:center;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.3;font-weight:500;background:rgba(255,255,255,.92);border-radius:4px;padding:1px 4px;position:relative;z-index:5;box-shadow:0 1px 2px #0001}
 .dpb{position:absolute;top:1px;right:1px;background:#2a6ab0;color:#fff;font-size:7px;padding:0 3px;border-radius:2px;line-height:1.5;z-index:2}
-.ct-deep{opacity:0.45;margin-top:-8px}.ct-deep:hover{opacity:0.75}
+.ct{position:relative;z-index:1}
+.ct-deep{z-index:0;opacity:0.5;margin-left:-55px}
 .ct-sti{position:absolute;top:2px;right:2px;width:7px;height:7px;border:1px solid #fff8;border-radius:50%}
 .ct-sti.s在库{background:#2a9a4a}.ct-sti.s已取出{background:#c0a020}.ct-sti.s已用完{background:#c04040}.ct-sti.s待处理{background:#3070b0}
 
@@ -188,14 +189,14 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .fsel{font-size:11px;flex:1;min-width:0;padding:4px 4px}
   .main{flex-direction:column}
   .sa{padding:4px 4px}
-  .sf{min-width:0;width:100%;display:block;border-radius:4px;padding:1px 3px}
+  .sf{min-width:0;width:154%;transform:scale(0.65);transform-origin:top left;display:block;border-radius:4px;padding:1px 3px}
   .st{flex-wrap:wrap;gap:4px;font-size:13px;margin-bottom:4px}
   .st .btn{padding:3px 8px;font-size:11px}
   .lv{padding:3px 4px}
   .lv-l{font-size:10px;margin-bottom:2px}
-  .lv-c{gap:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
+  .lv-c{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
   .lv-c::-webkit-scrollbar{display:none}
-  .ct{transform:scale(0.68);transform-origin:bottom left;margin:-4px -6px}
+  .ct{margin:0}
   .ct-lb{font-size:9px}
   .sb{height:3px}
   .pn{width:100%;max-height:45vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
@@ -242,19 +243,19 @@ const INIT={id:'shelf1',name:'架3',levels:[
     {id:'r1c5',type:'plastic_bin',color:'#4a9a8a',size:'m',label:'九三垦区',source:'',location:'九三垦区',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'青绿色收纳筐',status:'在库',stackParent:null},
   ]},
   {id:'L2',label:'第二层',containers:[
-    {id:'r2c1',type:'plastic_bag',color:'#c4ccd8',size:'s',label:'北京上庄',source:'课题组样地',location:'北京上庄',coordinates:'40°08′N, 116°10′E',amendment:'生物炭、化肥',amendmentAmount:'BC:1.33kg/m2',treatment:'BC+HF',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null},
+    {id:'r2c1',type:'plastic_bag',color:'#c4ccd8',size:'s',label:'北京上庄',source:'课题组样地',location:'北京上庄',coordinates:'40°08′N, 116°10′E',amendment:'生物炭、化肥',amendmentAmount:'BC:1.33kg/m2',treatment:'BC+HF',samplingDepth:'',amendmentDate:'2021.09.10',samplingDate:'2023.11',person:'刘洁',notes:'',status:'在库',stackParent:null},
     {id:'r2c2',type:'woven_bag',color:'#6b7f5a',size:'s',label:'2-2',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r2c3',type:'woven_bag',color:'#8a9a7a',size:'s',label:'2-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r2c2'},
     {id:'r2c4',type:'woven_bag',color:'#5c6e4c',size:'s',label:'2-4',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r2c5',type:'woven_bag',color:'#e8e6e0',size:'m',label:'北京上庄',source:'课题组样地',location:'北京上庄',coordinates:'40°08′N, 116°10′E',amendment:'生物炭、化肥',amendmentAmount:'BC:1.33kg/m2',treatment:'BC+HF',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'白色编织袋',status:'在库',stackParent:null},
+    {id:'r2c5',type:'woven_bag',color:'#e8e6e0',size:'m',label:'北京上庄',source:'课题组样地',location:'北京上庄',coordinates:'40°08′N, 116°10′E',amendment:'生物炭、化肥',amendmentAmount:'BC:1.33kg/m2',treatment:'BC+HF',samplingDepth:'',amendmentDate:'2021.09.10',samplingDate:'2022.11',person:'刘洁、任家琪',notes:'白色编织袋',status:'在库',stackParent:null},
     {id:'r2c6',type:'woven_bag',color:'#9aaa8a',size:'m',label:'2-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r2c7',type:'instrument',color:'#2a2a3a',size:'m',label:'PL-DY500',source:'非土样',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'—',notes:'紫外线老化箱',status:'在库',stackParent:null},
   ]},
   {id:'L3',label:'第三层',containers:[
     {id:'r3c1',type:'woven_bag',color:'#7a8e6a',size:'s',label:'3-1',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r3c2',type:'plastic_bin',color:'#9a5ab0',size:'l',label:'宁夏CK NPK',source:'其他样地',location:'宁夏银川',coordinates:'38°13′N, 106°12′E',amendment:'',amendmentAmount:'',treatment:'CK NPK',samplingDepth:'',amendmentDate:'',samplingDate:'2024.4',person:'',samples:'',notes:'',status:'在库',stackParent:null},
-    {id:'r3c3',type:'woven_bag',color:'#e8e6e0',size:'m',label:'河南 CK',source:'课题组样地',location:'河南',coordinates:'33°58\'N, 116°21\'E',amendment:'',amendmentAmount:'',treatment:'CK',samplingDepth:'',amendmentDate:'',samplingDate:'2022.10',person:'',samples:'',notes:'白色编织袋',status:'在库',stackParent:null},
-    {id:'r3c4',type:'woven_bag',color:'#5c6e4c',size:'s',label:'黑龙江绥化',source:'其他样地',location:'黑龙江绥化',coordinates:'',amendment:'生物炭、化肥',amendmentAmount:'BC:4.7kg/plot',person:'梁新茹、张云娴',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null},
+    {id:'r3c2',type:'plastic_bin',color:'#9a5ab0',size:'l',label:'宁夏CK NPK',source:'其他样地',location:'宁夏银川',coordinates:'38°13′N, 106°12′E',amendment:'化肥',amendmentAmount:'NPK',treatment:'CK NPK',samplingDepth:'',amendmentDate:'2018',samplingDate:'2024.04',person:'梁新茹',samples:'',notes:'',status:'在库',stackParent:null},
+    {id:'r3c3',type:'woven_bag',color:'#e8e6e0',size:'m',label:'河南CK',source:'课题组样地',location:'河南豫东',coordinates:"33°58'N, 116°21'E",amendment:'生物炭',amendmentAmount:'1.33kg/m2',treatment:'CK',samplingDepth:'',amendmentDate:'2021.09',samplingDate:'2022.10',person:'任家琪',notes:'白色编织袋',status:'在库',stackParent:null},
+    {id:'r3c4',type:'woven_bag',color:'#5c6e4c',size:'s',label:'黑龙江绥化',source:'其他样地',location:'黑龙江绥化',coordinates:'',amendment:'生物炭、化肥',amendmentAmount:'BC:4.7kg/plot',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'2025.10.17',person:'梁新茹、张云娴',notes:'',status:'在库',stackParent:null},
     {id:'r3c5',type:'plastic_bag',color:'#b0b4c0',size:'s',label:'3-5',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r3c6',type:'plastic_bag',color:'#d0d4dc',size:'s',label:'3-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r3c5'},
   ]},
@@ -262,7 +263,7 @@ const INIT={id:'shelf1',name:'架3',levels:[
     {id:'r4c1',type:'woven_bag',color:'#7a8e6a',size:'s',label:'4-1',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r4c2',type:'plastic_bin',color:'#a0c040',size:'l',label:'剖面',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'剖面',amendmentDate:'',samplingDate:'',person:'',samples:'剖面土样',notes:'',status:'在库',stackParent:null},
     {id:'r4c3',type:'plastic_bag',color:'#d0d4dc',size:'s',label:'4-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r4c4',type:'plastic_bin',color:'#70b8d8',size:'l',label:'宁夏 2024.4',source:'其他样地',location:'宁夏',coordinates:'38°13′N, 106°12′E',amendment:'化肥',amendmentAmount:'',treatment:'化肥处理',samplingDepth:'',amendmentDate:'',samplingDate:'2024.4',person:'',samples:'',notes:'',status:'在库',stackParent:null},
+    {id:'r4c4',type:'plastic_bin',color:'#70b8d8',size:'l',label:'宁夏 2024.4',source:'其他样地',location:'宁夏银川',coordinates:'38°13′N, 106°12′E',amendment:'化肥',amendmentAmount:'',treatment:'化肥处理',samplingDepth:'',amendmentDate:'',samplingDate:'2024.4',person:'',samples:'',notes:'',status:'在库',stackParent:null},
     {id:'r4c5',type:'woven_bag',color:'#6b7f5a',size:'s',label:'4-5',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r4c6',type:'woven_bag',color:'#8a9a7a',size:'s',label:'4-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r4c5'},
     {id:'r4c7',type:'woven_bag',color:'#c8c090',size:'m',label:'4-7',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
@@ -277,8 +278,8 @@ const INIT2={id:'shelf2',name:'架4',levels:[
     {..._(),id:'s2r2c1',color:'#6b7f5a',label:'2-1'},
     {..._(),id:'s2r2c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'2-2'},
     {..._(),id:'s2r2c3',color:'#7a8e6a',label:'2-3'},
-    {..._(),id:'s2r2c4',type:'plastic_bag',color:'#c4ccd8',label:'安徽池州CK',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'CK',amendment:'生物炭',amendmentAmount:'1.33kg/m2'},
-    {..._(),id:'s2r2c5',type:'plastic_bag',color:'#d0d4dc',label:'安徽池州BC',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'BC',amendment:'生物炭',amendmentAmount:'1.33kg/m2'},
+    {..._(),id:'s2r2c4',type:'plastic_bag',color:'#c4ccd8',label:'安徽池州CK',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'CK',amendment:'生物炭',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.19',person:'陈雅兰'},
+    {..._(),id:'s2r2c5',type:'plastic_bag',color:'#d0d4dc',label:'安徽池州BC',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'BC',amendment:'生物炭',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.19',person:'陈雅兰'},
     {..._(),id:'s2r2c6',color:'#e8e6e0',size:'xs',label:'湖南消落带',location:'湖南',notes:'后排，在安徽池州塑料袋后面',depth:2},
     {..._(),id:'s2r2c7',color:'#c8b898',size:'s',label:'新疆石河子',location:'新疆石河子',notes:'后排，化肥编织袋',depth:2},
   ]},
@@ -520,11 +521,10 @@ function renderCtn(c,lv,ci,hs){
   const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':'',isDeep?'ct-deep':''].filter(Boolean).join(' ');
   const cm=c.color||'#999',cd=dk(cm),cl=lt(cm);
   const fn=S.stkMode?`event.stopPropagation();stkTarget('${c.id}')`:S.moveMode?`event.stopPropagation();moveTap('${c.id}','${lv.id}')`:`selC('${c.id}')`;
-  const dw=isDeep?Math.round(sz.w*0.6):sz.w, dh=isDeep?Math.round(sz.h*0.6):sz.h;
-  return `<div class="${cls}" style="width:${dw}px" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
-    ${isDeep?'':(ctnTop(c))}
-    <div class="ct-b ${c.vis||c.type}" style="height:${dh}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}${isDeep?`<div class="dpb">深${c.depth}</div>`:`<div class="ct-sti s${c.status||'在库'}"></div>`}</div>
-    <div class="ct-lb" style="width:${dw}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div></div>`;
+  return `<div class="${cls}" style="width:${sz.w}px" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
+    ${ctnTop(c)}
+    <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}${isDeep?`<div class="dpb">${c.depth}</div>`:`<div class="ct-sti s${c.status||'在库'}"></div>`}</div>
+    <div class="ct-lb" style="width:${sz.w}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div></div>`;
 }
 function renderStack(base,top,lv,hs){
   const szB=SZ[base.size]||SZ.m,szT=SZ[top.size]||SZ.m,w=Math.max(szB.w,szT.w);
@@ -534,11 +534,11 @@ function renderStack(base,top,lv,hs){
   return `<div class="stkg${dim?' dim':''}" style="width:${w}px" data-cid="${base.id}">
     <div class="ct ct-top${selT?' sel':''}${hitT?' srhit':''}" style="width:${szT.w}px" data-cid="${top.id}" onclick="event.stopPropagation();${fnT}" draggable="${S.moveMode}" ondragstart="dragS(event,'${top.id}','${lv.id}')">
       ${ctnTop(top)}
-      <div class="ct-b ${top.vis||top.type}" style="height:${szT.h}px;--cm:${cmT};--cd:${cdT};--cl:${clT}">${ctnInner(top)}<div class="ct-sti s${top.status||'在库'}"></div><div class="stk-badge">上</div></div>
+      <div class="ct-b ${top.vis||top.type}" style="height:${szT.h}px;--cm:${cmT};--cd:${cdT};--cl:${clT}">${ctnInner(top)}<div class="ct-sti s${top.status||'在库'}"></div></div>
       <div class="ct-lb" style="width:${szT.w}px">${esc(top.label.length>7?top.label.slice(0,6)+'…':top.label)}</div></div>
     <div class="ct ct-bot${selB?' sel':''}${hitB?' srhit':''}" style="width:${szB.w}px" data-cid="${base.id}" onclick="event.stopPropagation();${fnB}" draggable="${S.moveMode}" ondragstart="dragS(event,'${base.id}','${lv.id}')">
       ${ctnTop(base)}
-      <div class="ct-b ${base.vis||base.type}" style="height:${szB.h}px;--cm:${cmB};--cd:${cdB};--cl:${clB}">${ctnInner(base)}<div class="ct-sti s${base.status||'在库'}"></div><div class="stk-badge">下</div></div>
+      <div class="ct-b ${base.vis||base.type}" style="height:${szB.h}px;--cm:${cmB};--cd:${cdB};--cl:${clB}">${ctnInner(base)}<div class="ct-sti s${base.status||'在库'}"></div></div>
       <div class="ct-lb" style="width:${szB.w}px">${esc(base.label.length>7?base.label.slice(0,6)+'…':base.label)}</div></div></div>`;
 }
 function renderPanel(){
