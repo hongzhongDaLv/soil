@@ -25,7 +25,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .sbar-w{flex:1;min-width:200px}
 #si{width:100%;padding:7px 12px;background:var(--sf2);border:2px solid var(--bd);color:var(--txt);font-size:15px;outline:none;border-radius:8px;box-shadow:inset 0 1px 3px #0001}
 #si:focus{border-color:var(--acc)}#si::placeholder{color:#b0b8c4}
-.fsel{padding:5px 8px;min-width:90px;background:var(--sf2);border:2px solid var(--bd);color:var(--txt);font-size:13px;border-radius:6px;box-shadow:0 1px 3px #0001}
+.fsel{padding:5px 8px;width:100px;background:var(--sf2);border:2px solid var(--bd);color:var(--txt);font-size:13px;border-radius:6px;box-shadow:0 1px 3px #0001}
 .scnt{font-size:13px;color:var(--mt);white-space:nowrap}
 .main{display:flex;flex:1;overflow:hidden}
 .sa{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 14px;display:flex;flex-direction:column;align-items:center}
@@ -48,8 +48,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ct.dim,.stkg.dim{opacity:.18;filter:grayscale(.6)}
 .ct-b{width:100%;position:relative;overflow:visible}
 .ct-lb{font-size:11px;color:#444;text-align:center;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.3;font-weight:500;background:rgba(255,255,255,.92);border-radius:4px;padding:1px 4px;position:relative;z-index:5;box-shadow:0 1px 2px #0001}
-.dpg{margin-top:14px}.ct-peek{cursor:pointer;transition:opacity .15s}.ct-peek:hover{opacity:0.8!important}
 .dpb{position:absolute;top:1px;right:1px;background:#2a6ab0;color:#fff;font-size:7px;padding:0 3px;border-radius:2px;line-height:1.5;z-index:2}
+.ct-deep{opacity:0.45;margin-top:-8px}.ct-deep:hover{opacity:0.75}
 .ct-sti{position:absolute;top:2px;right:2px;width:7px;height:7px;border:1px solid #fff8;border-radius:50%}
 .ct-sti.s在库{background:#2a9a4a}.ct-sti.s已取出{background:#c0a020}.ct-sti.s已用完{background:#c04040}.ct-sti.s待处理{background:#3070b0}
 
@@ -193,7 +193,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .st .btn{padding:3px 8px;font-size:11px}
   .lv{padding:3px 4px}
   .lv-l{font-size:10px;margin-bottom:2px}
-  .lv-c{gap:1px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
+  .lv-c{gap:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
   .lv-c::-webkit-scrollbar{display:none}
   .ct{transform:scale(0.68);transform-origin:bottom left;margin:-4px -6px}
   .ct-lb{font-size:9px}
@@ -334,7 +334,7 @@ Object.defineProperty(S,'shelf',{get(){return S.shelves?S.shelves[S.shelfIdx]:nu
 function save(){try{localStorage.setItem('sv7-s',JSON.stringify(S.shelves));localStorage.setItem('sv7-l',JSON.stringify(S.log));localStorage.setItem('sv7-h',JSON.stringify(S.hist))}catch{}}
 function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))]}
 let lastSaved='';
-function commit(a,d){S.log=[{t:TS(),a,d},...S.log].slice(0,300);S.hist=[{t:TS(),s:JSON.parse(JSON.stringify(S.shelves))},...S.hist].slice(0,60);save();cloudPush().then(ok=>{if(ok){lastSaved=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});const b=document.getElementById('save-status');if(b)b.textContent='☁ '+lastSaved+'已保存'}else{const b=document.getElementById('save-status');if(b)b.textContent='⚠ 保存失败'}})}
+function commit(a,d){S.log=[{t:TS(),a,d},...S.log].slice(0,300);S.hist=[{t:TS(),s:JSON.parse(JSON.stringify(S.shelves))},...S.hist].slice(0,60);save();cloudPush().then(ok=>{if(ok){lastSaved=new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});const b=document.getElementById('save-status');if(b)b.textContent='☁ '+lastSaved+'已保存'}else{const b=document.getElementById('save-status');if(b)b.textContent='⚠ 保存失败'}})}
 function findC(id){for(const l of S.shelf.levels){const c=l.containers.find(x=>x.id===id);if(c)return{c,l}}return null}
 function allC(){const r=[];S.shelf.levels.forEach(l=>l.containers.forEach(c=>r.push({c,l})));return r}
 function getLocs(){const s=new Set();allC().forEach(({c})=>{if(c.location)s.add(c.location)});return[...s].sort()}
@@ -349,19 +349,9 @@ function render(){
   S.shelf.levels.forEach((lv,li)=>{
     let ch='';const done=new Set();
     lv.containers.forEach((c,ci)=>{if(done.has(c.id)||c.stackParent)return;
-      if((c.depth||1)>1)return;
       const child=lv.containers.find(x=>x.stackParent===c.id);
       if(child){done.add(c.id);done.add(child.id);ch+=renderStack(c,child,lv,hs)}
-      else{
-        const behinds=[];
-        for(let j=ci+1;j<lv.containers.length;j++){
-          const nc=lv.containers[j];
-          if((nc.depth||1)>1&&!nc.stackParent){behinds.push(nc);done.add(nc.id)}else break;
-        }
-        done.add(c.id);
-        if(behinds.length)ch+=renderDepthGrp(c,behinds,lv,ci,hs);
-        else ch+=renderCtn(c,lv,ci,hs);
-      }
+      else{done.add(c.id);ch+=renderCtn(c,lv,ci,hs)}
     });
     lv.containers.forEach(c=>{if(!done.has(c.id)){done.add(c.id);ch+=renderCtn(c,lv,0,hs)}});
     shelfH+=`<div class="lv"><div class="lv-l">${esc(lv.label)}</div>
@@ -525,14 +515,16 @@ function ctnInner(c){
   return inn;
 }
 function renderCtn(c,lv,ci,hs){
+  const isDeep=(c.depth||0)>1;
   const sz=SZ[c.size]||SZ.m,sel=S.sel===c.id,hit=S.hits.includes(c.id),dim=hs&&!hit;
-  const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':''].filter(Boolean).join(' ');
+  const cls=['ct',sel?'sel':'',hit?'srhit':'',dim?'dim':'',isDeep?'ct-deep':''].filter(Boolean).join(' ');
   const cm=c.color||'#999',cd=dk(cm),cl=lt(cm);
   const fn=S.stkMode?`event.stopPropagation();stkTarget('${c.id}')`:S.moveMode?`event.stopPropagation();moveTap('${c.id}','${lv.id}')`:`selC('${c.id}')`;
-  return `<div class="${cls}" style="width:${sz.w}px" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
-    ${ctnTop(c)}
-    <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}<div class="ct-sti s${c.status||'在库'}"></div></div>
-    <div class="ct-lb" style="width:${sz.w}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div></div>`;
+  const dw=isDeep?Math.round(sz.w*0.6):sz.w, dh=isDeep?Math.round(sz.h*0.6):sz.h;
+  return `<div class="${cls}" style="width:${dw}px" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
+    ${isDeep?'':(ctnTop(c))}
+    <div class="ct-b ${c.vis||c.type}" style="height:${dh}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}${isDeep?`<div class="dpb">深${c.depth}</div>`:`<div class="ct-sti s${c.status||'在库'}"></div>`}</div>
+    <div class="ct-lb" style="width:${dw}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div></div>`;
 }
 function renderStack(base,top,lv,hs){
   const szB=SZ[base.size]||SZ.m,szT=SZ[top.size]||SZ.m,w=Math.max(szB.w,szT.w);
@@ -548,22 +540,6 @@ function renderStack(base,top,lv,hs){
       ${ctnTop(base)}
       <div class="ct-b ${base.vis||base.type}" style="height:${szB.h}px;--cm:${cmB};--cd:${cdB};--cl:${clB}">${ctnInner(base)}<div class="ct-sti s${base.status||'在库'}"></div><div class="stk-badge">下</div></div>
       <div class="ct-lb" style="width:${szB.w}px">${esc(base.label.length>7?base.label.slice(0,6)+'…':base.label)}</div></div></div>`;
-}
-function renderDepthGrp(front,behinds,lv,ci,hs){
-  const frontH=renderCtn(front,lv,ci,hs);
-  const fsz=SZ[front.size]||SZ.m;
-  let peekH='';
-  behinds.forEach((b,i)=>{
-    const sz=SZ[b.size]||SZ.m;
-    const cm=b.color||'#999',cd=dk(cm),cl=lt(cm);
-    const sel=S.sel===b.id,hit=S.hits.includes(b.id),dim=hs&&!hit;
-    const fn=S.moveMode?`event.stopPropagation();moveTap('${b.id}','${lv.id}')`:`selC('${b.id}')`;
-    const pw=Math.round(fsz.w*0.5),ph=Math.round(sz.h*0.45);
-    peekH+=`<div class="ct ct-peek${sel?' sel':''}${hit?' srhit':''}${dim?' dim':''}" style="position:absolute;top:${-ph+4-i*10}px;right:${-pw*0.35-i*6}px;width:${pw}px;opacity:${hit?0.85:0.45};z-index:${-1-i}" data-cid="${b.id}" onclick="event.stopPropagation();${fn}">
-      <div class="ct-b ${b.vis||b.type}" style="height:${ph}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(b)}<div class="dpb">深${b.depth||2}</div></div>
-      <div class="ct-lb" style="width:${pw}px;font-size:8px">${esc(b.label.length>5?b.label.slice(0,4)+'…':b.label)}</div></div>`;
-  });
-  return `<div class="dpg" style="position:relative;flex-shrink:0">${frontH}${peekH}</div>`;
 }
 function renderPanel(){
   if(S.tab==='info'){
@@ -745,7 +721,7 @@ async function cloudPush(){
   const ok=await cloudPull();
   if(ok){
     render();
-    lastSaved=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+    lastSaved=new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
     toast('☁ 数据已加载');
     return;
   }
@@ -764,7 +740,7 @@ window.cloudSync=()=>{navigator.clipboard?.writeText(location.href);toast('链�
 window.manualSave=async()=>{
   const b=document.getElementById('save-status');if(b)b.textContent='保存中…';
   const ok=await cloudPush();
-  if(ok){lastSaved=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});if(b)b.textContent='☁ '+lastSaved+'已保存'}
+  if(ok){lastSaved=new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});if(b)b.textContent='☁ '+lastSaved+'已保存'}
   else{if(b)b.textContent='⚠ 失败'}
 };
 window.checkLogPwd=()=>{
