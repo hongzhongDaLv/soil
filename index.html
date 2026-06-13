@@ -55,7 +55,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .dpb{position:absolute;top:1px;right:1px;background:#2a6ab0;color:#fff;font-size:7px;padding:0 3px;border-radius:2px;line-height:1.5;z-index:2}
 .ct{position:relative;z-index:1}
 .ct-deep{z-index:0;opacity:0.5}
-.ct-peek{cursor:pointer;transition:opacity .15s}.ct-peek:hover{opacity:0.8!important}
+
 .ct-sti{position:absolute;top:2px;right:2px;width:7px;height:7px;border:1px solid #fff8;border-radius:50%}
 .ct-sti.s在库{background:#2a9a4a}.ct-sti.s已取出{background:#c0a020}.ct-sti.s已用完{background:#c04040}.ct-sti.s待处理{background:#3070b0}
 
@@ -359,16 +359,10 @@ function render(){
   let shelfH='';
   S.shelf.levels.forEach((lv,li)=>{
     let ch='';const done=new Set();
-    lv.containers.forEach((c,ci)=>{if(done.has(c.id)||c.stackParent||c.depthParent)return;
+    lv.containers.forEach((c,ci)=>{if(done.has(c.id)||c.stackParent)return;
       const child=lv.containers.find(x=>x.stackParent===c.id);
       if(child){done.add(c.id);done.add(child.id);ch+=renderStack(c,child,lv,hs)}
-      else{
-        const behinds=lv.containers.filter(x=>x.depthParent===c.id);
-        behinds.forEach(b=>done.add(b.id));
-        done.add(c.id);
-        if(behinds.length)ch+=renderWithPeek(c,behinds,lv,ci,hs);
-        else ch+=renderCtn(c,lv,ci,hs);
-      }
+      else{done.add(c.id);ch+=renderCtn(c,lv,ci,hs)}
     });
     lv.containers.forEach(c=>{if(!done.has(c.id)){done.add(c.id);ch+=renderCtn(c,lv,0,hs)}});
     shelfH+=`<div class="lv"><div class="lv-l">${esc(lv.label)}</div>
@@ -550,7 +544,7 @@ function renderCtn(c,lv,ci,hs){
   const ml=isDeep?-Math.round(sz.w*0.7):0;
   return `<div class="${cls}" style="width:${sz.w}px${ml?';margin-left:'+ml+'px':''}" data-cid="${c.id}" draggable="${S.moveMode}" onclick="${fn}" ondragstart="dragS(event,'${c.id}','${lv.id}')" ondragover="event.preventDefault();event.stopPropagation()" ondrop="event.stopPropagation();onDrop(event,'${lv.id}',${ci})">
     ${ctnTop(c)}
-    <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}${isDeep?`<div class="dpb">${c.depth}</div>`:`<div class="ct-sti s${c.status||'在库'}"></div>`}</div>
+    <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}${isDeep?`<div class="dpb">${c.depth}</div>`:''}<div class="ct-sti s${c.status||'在库'}"></div></div>
     <div class="ct-lb" style="width:${sz.w}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div></div>`;
 }
 function renderStack(base,top,lv,hs){
@@ -567,22 +561,6 @@ function renderStack(base,top,lv,hs){
       ${ctnTop(base)}
       <div class="ct-b ${base.vis||base.type}" style="height:${szB.h}px;--cm:${cmB};--cd:${cdB};--cl:${clB}">${ctnInner(base)}<div class="ct-sti s${base.status||'在库'}"></div></div>
       <div class="ct-lb" style="width:${szB.w}px">${esc(base.label.length>7?base.label.slice(0,6)+'…':base.label)}</div></div></div>`;
-}
-function renderWithPeek(front,behinds,lv,ci,hs){
-  const frontH=renderCtn(front,lv,ci,hs);
-  const fsz=SZ[front.size]||SZ.m;
-  let peekH='';
-  behinds.forEach((b,i)=>{
-    const cm=b.color||'#999',cd=dk(cm),cl=lt(cm);
-    const sel=S.sel===b.id,hit=S.hits.includes(b.id),dim=hs&&!hit;
-    const fn=S.moveMode?`event.stopPropagation();moveTap('${b.id}','${lv.id}')`:`selC('${b.id}')`;
-    const pw=Math.round(fsz.w*0.28);
-    peekH+=`<div class="ct ct-peek${sel?' sel':''}${hit?' srhit':''}${dim?' dim':''}" style="position:absolute;top:2px;right:${-pw-i*pw}px;width:${pw}px;opacity:${hit?0.85:0.5};z-index:${-1-i}" data-cid="${b.id}" onclick="event.stopPropagation();${fn}">
-      <div class="ct-b ${b.vis||b.type}" style="height:${fsz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(b)}<div class="dpb">${b.depth||2}</div></div>
-      <div class="ct-lb" style="width:${pw}px;font-size:7px">${esc(b.label.length>3?b.label.slice(0,3)+'…':b.label)}</div></div>`;
-  });
-  const extraR=Math.round(fsz.w*0.28)*behinds.length+2;
-  return `<div style="position:relative;flex-shrink:0;margin-right:${extraR}px">${frontH}${peekH}</div>`;
 }
 function renderPanel(){
   if(S.tab==='info'){
