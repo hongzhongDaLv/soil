@@ -28,7 +28,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .fsel{padding:5px 8px;min-width:90px;background:var(--sf2);border:2px solid var(--bd);color:var(--txt);font-size:13px;border-radius:6px;box-shadow:0 1px 3px #0001}
 .scnt{font-size:13px;color:var(--mt);white-space:nowrap}
 .main{display:flex;flex:1;overflow:hidden}
-.sa{flex:1;overflow:auto;padding:10px 14px;display:flex;flex-direction:column;align-items:center}
+.sa{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 14px;display:flex;flex-direction:column;align-items:center}
 .st{font-size:16px;font-weight:bold;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .st-n{font-size:13px;color:var(--mt);font-weight:normal}
 .sf{background:var(--sf2);border:2px solid var(--shelf);padding:2px 6px;display:inline-block;min-width:500px;border-radius:6px;box-shadow:0 2px 8px #0001}
@@ -48,6 +48,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ct.dim,.stkg.dim{opacity:.18;filter:grayscale(.6)}
 .ct-b{width:100%;position:relative;overflow:visible}
 .ct-lb{font-size:11px;color:#444;text-align:center;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.3;font-weight:500;background:rgba(255,255,255,.92);border-radius:4px;padding:1px 4px;position:relative;z-index:5;box-shadow:0 1px 2px #0001}
+.dpg{margin-top:14px}.ct-peek{cursor:pointer;transition:opacity .15s}.ct-peek:hover{opacity:0.8!important}
+.dpb{position:absolute;top:1px;right:1px;background:#2a6ab0;color:#fff;font-size:7px;padding:0 3px;border-radius:2px;line-height:1.5;z-index:2}
 .ct-sti{position:absolute;top:2px;right:2px;width:7px;height:7px;border:1px solid #fff8;border-radius:50%}
 .ct-sti.s在库{background:#2a9a4a}.ct-sti.s已取出{background:#c0a020}.ct-sti.s已用完{background:#c04040}.ct-sti.s待处理{background:#3070b0}
 
@@ -191,8 +193,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .st .btn{padding:3px 8px;font-size:11px}
   .lv{padding:3px 4px}
   .lv-l{font-size:10px;margin-bottom:2px}
-  .lv-c{gap:1px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px}
-  .ct{transform:scale(0.68);transform-origin:bottom left;margin:-4px -4px}
+  .lv-c{gap:1px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
+  .lv-c::-webkit-scrollbar{display:none}
+  .ct{transform:scale(0.68);transform-origin:bottom left;margin:-4px -6px}
   .ct-lb{font-size:9px}
   .sb{height:3px}
   .pn{width:100%;max-height:45vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
@@ -231,7 +234,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 // ===== INITIAL DATA =====
 const INIT={id:'shelf1',name:'架3',levels:[
-  {id:'L1',label:'第一层（顶层）',containers:[
+  {id:'L1',label:'第一层',containers:[
     {id:'r1c1',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'DCS',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'DCS',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'袋装土样',notes:'',status:'在库',stackParent:null},
     {id:'r1c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'HLF',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'HLF',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'袋装土样',notes:'',status:'在库',stackParent:null},
     {id:'r1c3',type:'plastic_bin',vis:'transparent_box',color:'#b8d8ea',size:'l',label:'1-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null},
@@ -255,7 +258,7 @@ const INIT={id:'shelf1',name:'架3',levels:[
     {id:'r3c5',type:'plastic_bag',color:'#b0b4c0',size:'s',label:'3-5',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r3c6',type:'plastic_bag',color:'#d0d4dc',size:'s',label:'3-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r3c5'},
   ]},
-  {id:'L4',label:'第四层（底层）',containers:[
+  {id:'L4',label:'第四层',containers:[
     {id:'r4c1',type:'woven_bag',color:'#7a8e6a',size:'s',label:'4-1',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r4c2',type:'plastic_bin',color:'#a0c040',size:'l',label:'剖面',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'剖面',amendmentDate:'',samplingDate:'',person:'',samples:'剖面土样',notes:'',status:'在库',stackParent:null},
     {id:'r4c3',type:'plastic_bag',color:'#d0d4dc',size:'s',label:'4-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
@@ -269,13 +272,15 @@ const INIT={id:'shelf1',name:'架3',levels:[
 const _=()=>({id:mid(),type:'woven_bag',color:'#7a8e6a',size:'s',label:'',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null});
 
 const INIT2={id:'shelf2',name:'架4',levels:[
-  {id:'S2L1',label:'第一层（顶层）',containers:[]},
+  {id:'S2L1',label:'第一层',containers:[]},
   {id:'S2L2',label:'第二层',containers:[
     {..._(),id:'s2r2c1',color:'#6b7f5a',label:'2-1'},
     {..._(),id:'s2r2c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'2-2'},
     {..._(),id:'s2r2c3',color:'#7a8e6a',label:'2-3'},
-    {..._(),id:'s2r2c4',type:'plastic_bag',color:'#c4ccd8',label:'新疆',location:'新疆'},
-    {..._(),id:'s2r2c5',type:'plastic_bag',color:'#d0d4dc',label:'新疆',location:'新疆'},
+    {..._(),id:'s2r2c4',type:'plastic_bag',color:'#c4ccd8',label:'安徽池州CK',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'CK',amendment:'生物炭',amendmentAmount:'1.33kg/m2'},
+    {..._(),id:'s2r2c5',type:'plastic_bag',color:'#d0d4dc',label:'安徽池州BC',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'BC',amendment:'生物炭',amendmentAmount:'1.33kg/m2'},
+    {..._(),id:'s2r2c6',color:'#e8e6e0',size:'xs',label:'湖南消落带',location:'湖南',notes:'后排，在安徽池州塑料袋后面',depth:2},
+    {..._(),id:'s2r2c7',color:'#c8b898',size:'s',label:'新疆石河子',location:'新疆石河子',notes:'后排，化肥编织袋',depth:2},
   ]},
   {id:'S2L3',label:'第三层',containers:[
     {..._(),id:'s2r3c1',type:'cardboard',color:'#b8956a',size:'m',label:'3-1'},
@@ -286,18 +291,23 @@ const INIT2={id:'shelf2',name:'架4',levels:[
     {..._(),id:'s2r3c6',type:'plastic_bag',color:'#b0b4c0',label:'3-6'},
     {..._(),id:'s2r3c7',color:'#8a9a7a',label:'3-7'},
   ]},
-  {id:'S2L4',label:'第四层（底层）',containers:[]},
+  {id:'S2L4',label:'第四层',containers:[
+    {..._(),id:'s2r4c1',size:'l',color:'#7a8e6a',label:'4-4-1'},
+    {..._(),id:'s2r4c2',size:'l',color:'#6b7f5a',label:'4-4-2'},
+    {..._(),id:'s2r4c3',size:'l',color:'#8a9a7a',label:'4-4-3'},
+    {..._(),id:'s2r4c4',size:'l',color:'#5c6e4c',label:'4-4-4'},
+  ]},
 ]};
 
 const INIT3={id:'shelf3',name:'架1',levels:[
-  {id:'S3L1',label:'第一层（顶层）',containers:[]},
+  {id:'S3L1',label:'第一层',containers:[]},
   {id:'S3L2',label:'第二层',containers:[]},
   {id:'S3L3',label:'第三层',containers:[]},
-  {id:'S3L4',label:'第四层（底层）',containers:[]},
+  {id:'S3L4',label:'第四层',containers:[]},
 ]};
 
 const INIT4={id:'shelf4',name:'架2',levels:[
-  {id:'S4L1',label:'第一层（顶层）',containers:[]},
+  {id:'S4L1',label:'第一层',containers:[]},
   {id:'S4L2',label:'第二层',containers:[
     {..._(),id:'s4r2c1',color:'#7a8e6a',label:'4-2-1'},
     {..._(),id:'s4r2c2',color:'#e8e6e0',label:'4-2-2',notes:'白色编织袋'},
@@ -311,7 +321,7 @@ const INIT4={id:'shelf4',name:'架2',levels:[
     {..._(),id:'s4r3c5',color:'#5c6e4c',label:'4-3-5'},
     {..._(),id:'s4r3c6',type:'plastic_bag',color:'#c4ccd8',label:'4-3-6'},
   ]},
-  {id:'S4L4',label:'第四层（底层）',containers:[
+  {id:'S4L4',label:'第四层',containers:[
     {..._(),id:'s4r4c1',type:'cardboard',color:'#b8956a',size:'l',label:'宁夏炭+沈阳',location:'宁夏+沈阳',amendment:'生物炭',notes:'宁夏生物炭+沈阳'},
     {..._(),id:'s4r4c2',type:'cardboard',color:'#a88558',size:'m',label:'宁夏',location:'宁夏'},
     {..._(),id:'s4r4c3',color:'#7a8e6a',label:'4-4-3'},
@@ -339,9 +349,19 @@ function render(){
   S.shelf.levels.forEach((lv,li)=>{
     let ch='';const done=new Set();
     lv.containers.forEach((c,ci)=>{if(done.has(c.id)||c.stackParent)return;
+      if((c.depth||1)>1)return;
       const child=lv.containers.find(x=>x.stackParent===c.id);
       if(child){done.add(c.id);done.add(child.id);ch+=renderStack(c,child,lv,hs)}
-      else{done.add(c.id);ch+=renderCtn(c,lv,ci,hs)}
+      else{
+        const behinds=[];
+        for(let j=ci+1;j<lv.containers.length;j++){
+          const nc=lv.containers[j];
+          if((nc.depth||1)>1&&!nc.stackParent){behinds.push(nc);done.add(nc.id)}else break;
+        }
+        done.add(c.id);
+        if(behinds.length)ch+=renderDepthGrp(c,behinds,lv,ci,hs);
+        else ch+=renderCtn(c,lv,ci,hs);
+      }
     });
     lv.containers.forEach(c=>{if(!done.has(c.id)){done.add(c.id);ch+=renderCtn(c,lv,0,hs)}});
     shelfH+=`<div class="lv"><div class="lv-l">${esc(lv.label)}</div>
@@ -529,6 +549,22 @@ function renderStack(base,top,lv,hs){
       <div class="ct-b ${base.vis||base.type}" style="height:${szB.h}px;--cm:${cmB};--cd:${cdB};--cl:${clB}">${ctnInner(base)}<div class="ct-sti s${base.status||'在库'}"></div><div class="stk-badge">下</div></div>
       <div class="ct-lb" style="width:${szB.w}px">${esc(base.label.length>7?base.label.slice(0,6)+'…':base.label)}</div></div></div>`;
 }
+function renderDepthGrp(front,behinds,lv,ci,hs){
+  const frontH=renderCtn(front,lv,ci,hs);
+  const fsz=SZ[front.size]||SZ.m;
+  let peekH='';
+  behinds.forEach((b,i)=>{
+    const sz=SZ[b.size]||SZ.m;
+    const cm=b.color||'#999',cd=dk(cm),cl=lt(cm);
+    const sel=S.sel===b.id,hit=S.hits.includes(b.id),dim=hs&&!hit;
+    const fn=S.moveMode?`event.stopPropagation();moveTap('${b.id}','${lv.id}')`:`selC('${b.id}')`;
+    const pw=Math.round(fsz.w*0.5),ph=Math.round(sz.h*0.45);
+    peekH+=`<div class="ct ct-peek${sel?' sel':''}${hit?' srhit':''}${dim?' dim':''}" style="position:absolute;top:${-ph+4-i*10}px;right:${-pw*0.35-i*6}px;width:${pw}px;opacity:${hit?0.85:0.45};z-index:${-1-i}" data-cid="${b.id}" onclick="event.stopPropagation();${fn}">
+      <div class="ct-b ${b.vis||b.type}" style="height:${ph}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(b)}<div class="dpb">深${b.depth||2}</div></div>
+      <div class="ct-lb" style="width:${pw}px;font-size:8px">${esc(b.label.length>5?b.label.slice(0,4)+'…':b.label)}</div></div>`;
+  });
+  return `<div class="dpg" style="position:relative;flex-shrink:0">${frontH}${peekH}</div>`;
+}
 function renderPanel(){
   if(S.tab==='info'){
     if(!S.sel)return '<div class="empty">← 点击容器查看详情<br>或使用搜索栏按属性检索</div>';
@@ -551,7 +587,7 @@ function renderPanel(){
       <div class="fd"><label>类型</label><select id="ed-type">${Object.keys(TYPES).map(k=>`<option value="${k}" ${f.type===k?'selected':''}>${TYPES[k].l}</option>`).join('')}</select></div>
       <div class="fd"><label>尺寸</label><div class="szr">${SK.map(k=>`<button class="szb ${f.size===k?'on':''}" onclick="edSz('${k}')">${SL[k]}</button>`).join('')}</div></div>
       <div class="fd"><label>颜色</label><div class="cr">${(TYPES[f.type]?.cs||[]).map(c=>`<div class="cs ${f.color===c?'on':''}" style="background:${c}" onclick="edClr('${c}')"></div>`).join('')}</div></div>
-      ${ef('地点','location',f.location)}${ef('经纬度','coordinates',f.coordinates)}${ef('处理/添加','treatment',f.treatment,'CK / BC / 生物炭 / 微塑料…')}${ef('添加量','amendmentAmount',f.amendmentAmount)}${ef('深度','samplingDepth',f.samplingDepth,'0-20 / 剖面')}${ef('添加日期','amendmentDate',f.amendmentDate)}${ef('采样日期','samplingDate',f.samplingDate)}${ef('负责人','person',f.person)}
+      ${ef('地点','location',f.location)}${ef('经纬度','coordinates',f.coordinates)}${ef('处理/添加','treatment',f.treatment,'CK / BC / 生物炭 / 微塑料…')}${ef('添加量','amendmentAmount',f.amendmentAmount)}${ef('采样深度','samplingDepth',f.samplingDepth,'0-20 / 剖面')}${ef('添加日期','amendmentDate',f.amendmentDate)}${ef('采样日期','samplingDate',f.samplingDate)}${ef('负责人','person',f.person)}${ef('前后层次','depth',f.depth||'','1=最前 2=后排 空=默认前排')}
       <div class="fd"><label>状态</label><select id="ed-st">${STATS.map(s=>`<option value="${s}" ${f.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
       ${ea('备注','notes',f.notes)}
       <div style="display:flex;gap:8px;margin-top:10px"><button class="btn bp" onclick="saveEd()">${S.adding?'✓ 添加':'✓ 保存'}</button><button class="btn bg" onclick="cancelEd()">取消</button></div></div>`;
@@ -615,7 +651,7 @@ window.stab=t=>{S.tab=t;render()};
 window.startEdit=()=>{const f=findC(S.sel);if(!f)return;S.ef={...f.c};S.editing=true;S.adding=null;S.tab='edit';render();bindSel()};
 window.startAdd=lv=>{S.ef={id:mid(),type:'woven_bag',color:'#7a8e6a',size:'m',label:'',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null};S.adding=lv;S.editing=false;S.tab='edit';render();bindSel()};
 function bindSel(){setTimeout(()=>{document.getElementById('ed-type')?.addEventListener('change',e=>{S.ef.type=e.target.value;S.ef.color=TYPES[e.target.value]?.cs[0]||'#999';render();bindSel()});document.getElementById('ed-st')?.addEventListener('change',e=>{S.ef.status=e.target.value})},0)}
-window.edF=(k,v)=>{S.ef[k]=v};
+window.edF=(k,v)=>{S.ef[k]=k==='depth'?(parseInt(v)||0):v};
 window.edSz=v=>{S.ef.size=v;render();bindSel()};
 window.edClr=v=>{S.ef.color=v;render();bindSel()};
 window.saveEd=()=>{if(!S.ef.label){toast('请输入标签');return}if(S.adding){const lv=S.shelf.levels.find(l=>l.id===S.adding);if(lv){lv.containers.push({...S.ef});commit('新增',S.ef.label+' → '+lv.label)}S.adding=null}else{for(const l of S.shelf.levels){const i=l.containers.findIndex(x=>x.id===S.ef.id);if(i>=0){l.containers[i]={...S.ef};commit('编辑',S.ef.label);break}}}S.editing=false;S.tab='info';S.sel=S.ef.id;render()};
