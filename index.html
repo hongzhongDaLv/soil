@@ -51,6 +51,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .dpb{position:absolute;top:1px;right:1px;background:#2a6ab0;color:#fff;font-size:7px;padding:0 3px;border-radius:2px;line-height:1.5;z-index:2}
 .ct{position:relative;z-index:1}
 .ct-deep{z-index:0;opacity:0.5}
+.ct-peek{cursor:pointer;transition:opacity .15s}.ct-peek:hover{opacity:0.8!important}
 .ct-sti{position:absolute;top:2px;right:2px;width:7px;height:7px;border:1px solid #fff8;border-radius:50%}
 .ct-sti.s在库{background:#2a9a4a}.ct-sti.s已取出{background:#c0a020}.ct-sti.s已用完{background:#c04040}.ct-sti.s待处理{background:#3070b0}
 
@@ -189,7 +190,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .fsel{font-size:11px;flex:1;min-width:0;padding:4px 4px}
   .main{flex-direction:column}
   .sa{padding:4px 4px;align-items:flex-start}
-  .sf{min-width:0;width:154%;transform:scale(0.65);transform-origin:top left;display:block;border-radius:4px;padding:1px 3px}
+  .sf{min-width:0;width:100%;zoom:0.65;display:block;border-radius:4px;padding:1px 3px}
   .st{flex-wrap:wrap;gap:4px;font-size:13px;margin-bottom:4px}
   .st .btn{padding:3px 8px;font-size:11px}
   .lv{padding:3px 4px}
@@ -276,12 +277,12 @@ const INIT2={id:'shelf2',name:'架4',levels:[
   {id:'S2L1',label:'第一层',containers:[]},
   {id:'S2L2',label:'第二层',containers:[
     {..._(),id:'s2r2c1',color:'#6b7f5a',label:'2-1'},
+    {..._(),id:'s2r2c6',color:'#e8e6e0',size:'xs',label:'湖南消落带',location:'湖南',depth:2,depthParent:'s2r2c1'},
+    {..._(),id:'s2r2c7',color:'#c8b898',size:'s',label:'新疆石河子',location:'新疆石河子',depth:2,depthParent:'s2r2c1'},
     {..._(),id:'s2r2c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'2-2'},
     {..._(),id:'s2r2c3',color:'#7a8e6a',label:'2-3'},
     {..._(),id:'s2r2c4',type:'plastic_bag',color:'#c4ccd8',label:'安徽池州CK',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'CK',amendment:'生物炭',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.19',person:'陈雅兰'},
     {..._(),id:'s2r2c5',type:'plastic_bag',color:'#d0d4dc',label:'安徽池州BC',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'BC',amendment:'生物炭',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.19',person:'陈雅兰'},
-    {..._(),id:'s2r2c6',color:'#e8e6e0',size:'xs',label:'湖南消落带',location:'湖南',notes:'后排，在安徽池州塑料袋后面',depth:2},
-    {..._(),id:'s2r2c7',color:'#c8b898',size:'s',label:'新疆石河子',location:'新疆石河子',notes:'后排，化肥编织袋',depth:2},
   ]},
   {id:'S2L3',label:'第三层',containers:[
     {..._(),id:'s2r3c1',type:'cardboard',color:'#b8956a',size:'m',label:'3-1'},
@@ -349,10 +350,16 @@ function render(){
   let shelfH='';
   S.shelf.levels.forEach((lv,li)=>{
     let ch='';const done=new Set();
-    lv.containers.forEach((c,ci)=>{if(done.has(c.id)||c.stackParent)return;
+    lv.containers.forEach((c,ci)=>{if(done.has(c.id)||c.stackParent||c.depthParent)return;
       const child=lv.containers.find(x=>x.stackParent===c.id);
       if(child){done.add(c.id);done.add(child.id);ch+=renderStack(c,child,lv,hs)}
-      else{done.add(c.id);ch+=renderCtn(c,lv,ci,hs)}
+      else{
+        const behinds=lv.containers.filter(x=>x.depthParent===c.id);
+        behinds.forEach(b=>done.add(b.id));
+        done.add(c.id);
+        if(behinds.length)ch+=renderWithPeek(c,behinds,lv,ci,hs);
+        else ch+=renderCtn(c,lv,ci,hs);
+      }
     });
     lv.containers.forEach(c=>{if(!done.has(c.id)){done.add(c.id);ch+=renderCtn(c,lv,0,hs)}});
     shelfH+=`<div class="lv"><div class="lv-l">${esc(lv.label)}</div>
@@ -541,6 +548,23 @@ function renderStack(base,top,lv,hs){
       ${ctnTop(base)}
       <div class="ct-b ${base.vis||base.type}" style="height:${szB.h}px;--cm:${cmB};--cd:${cdB};--cl:${clB}">${ctnInner(base)}<div class="ct-sti s${base.status||'在库'}"></div></div>
       <div class="ct-lb" style="width:${szB.w}px">${esc(base.label.length>7?base.label.slice(0,6)+'…':base.label)}</div></div></div>`;
+}
+function renderWithPeek(front,behinds,lv,ci,hs){
+  const frontH=renderCtn(front,lv,ci,hs);
+  const fsz=SZ[front.size]||SZ.m;
+  let peekH='';
+  behinds.forEach((b,i)=>{
+    const sz=SZ[b.size]||SZ.m;
+    const cm=b.color||'#999',cd=dk(cm),cl=lt(cm);
+    const sel=S.sel===b.id,hit=S.hits.includes(b.id),dim=hs&&!hit;
+    const fn=S.moveMode?`event.stopPropagation();moveTap('${b.id}','${lv.id}')`:`selC('${b.id}')`;
+    const ph=Math.round(fsz.h*0.4);
+    const pw=Math.round(fsz.w*0.45);
+    peekH+=`<div class="ct ct-peek${sel?' sel':''}${hit?' srhit':''}${dim?' dim':''}" style="position:absolute;top:${-ph-4-i*8}px;right:${-pw*0.3-i*pw*0.5}px;width:${pw}px;opacity:${hit?0.85:0.5};z-index:${-1-i}" data-cid="${b.id}" onclick="event.stopPropagation();${fn}">
+      <div class="ct-b ${b.vis||b.type}" style="height:${ph}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(b)}<div class="dpb">${b.depth||2}</div></div>
+      <div class="ct-lb" style="width:${pw}px;font-size:8px">${esc(b.label.length>5?b.label.slice(0,4)+'…':b.label)}</div></div>`;
+  });
+  return `<div style="position:relative;flex-shrink:0;margin-top:${Math.round(fsz.h*0.4)+8}px;margin-right:${Math.round(fsz.w*0.2)}px">${frontH}${peekH}</div>`;
 }
 function renderPanel(){
   if(S.tab==='info'){
