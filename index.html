@@ -57,6 +57,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ct{position:relative;z-index:1}
 
 .dp-group{position:relative;flex-shrink:0}
+.tr-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:500;margin:1px 2px;line-height:1.4}
+.tr-CK{background:#e0e0e0;color:#555}.tr-BC{background:#c8e6c0;color:#2a5a1a}.tr-HF{background:#c0d8f0;color:#1a4a7a}.tr-MP{background:#f8d8b0;color:#8a5a1a}
+.tr-sel{cursor:pointer;opacity:0.4;border:2px solid transparent}.tr-sel.on{opacity:1;border-color:var(--acc)}
+.tr-edit{display:flex;flex-wrap:wrap;gap:4px;padding:4px 0}
 .dpbadge{position:absolute;top:-6px;right:-6px;background:#2a6ab0;color:#fff;min-width:18px;height:18px;border-radius:6px;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;border:2px solid var(--sf);font-weight:500;padding:0 4px;transition:transform .15s}
 .dpbadge:hover{transform:scale(1.15)}
 .dp-expand{position:absolute;top:100%;left:0;margin-top:6px;border:2px dashed var(--acc);border-radius:10px;padding:8px;background:var(--sf);z-index:20;display:flex;gap:6px;box-shadow:0 4px 16px #0002;min-width:max-content}
@@ -247,106 +251,12 @@ function lt(h,n=25){try{let c=h.replace('#','');if(c.length===3)c=c[0]+c[0]+c[1]
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 // ===== INITIAL DATA =====
-const INIT={id:'shelf1',name:'架3',levels:[
-  {id:'L1',label:'第一层',containers:[
-    {id:'r1c1',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'DCS',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'袋装土样',notes:'',status:'在库',stackParent:null},
-    {id:'r1c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'韩兰芳',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'袋装土样',notes:'',status:'在库',stackParent:null},
-    {id:'r1c3',type:'plastic_bin',vis:'transparent_box',color:'#b8d8ea',size:'l',label:'1-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null},
-    {id:'r1c4',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'1-4',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'',status:'在库',stackParent:null},
-    {id:'r1c5',type:'plastic_bin',color:'#4a9a8a',size:'m',label:'九三垦区',source:'',location:'九三垦区',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'',notes:'青绿色收纳筐',status:'在库',stackParent:null},
-  ]},
-  {id:'L2',label:'第二层',containers:[
-    {id:'r2c1',type:'plastic_bag',color:'#c4ccd8',size:'s',label:'北京上庄',source:'课题组样地',location:'北京上庄',coordinates:'40°08′N, 116°10′E',amendment:'BC+HF',amendmentAmount:'BC:1.33kg/m2',treatment:'BC+HF',samplingDepth:'',amendmentDate:'2021.09.10',samplingDate:'2023.11',person:'刘洁',notes:'',status:'在库',stackParent:null},
-    {id:'r2c2',type:'woven_bag',color:'#6b7f5a',size:'s',label:'2-2',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r2c3',type:'woven_bag',color:'#8a9a7a',size:'s',label:'2-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r2c2'},
-    {id:'r2c4',type:'woven_bag',color:'#5c6e4c',size:'s',label:'2-4',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r2c5',type:'woven_bag',color:'#e8e6e0',size:'m',label:'北京上庄',source:'课题组样地',location:'北京上庄',coordinates:'40°08′N, 116°10′E',amendment:'BC+HF',amendmentAmount:'BC:1.33kg/m2',treatment:'BC+HF',samplingDepth:'',amendmentDate:'2021.09.10',samplingDate:'2022.3.31',person:'刘洁、任家琪',notes:'白色编织袋',status:'在库',stackParent:null},
-    {id:'r2c6',type:'woven_bag',color:'#9aaa8a',size:'m',label:'2-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r2c7',type:'instrument',color:'#2a2a3a',size:'m',label:'PL-DY500',source:'非土样',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'—',notes:'紫外线老化箱',status:'在库',stackParent:null},
-  ]},
-  {id:'L3',label:'第三层',containers:[
-    {id:'r3c1',type:'woven_bag',color:'#7a8e6a',size:'s',label:'3-1',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r3c2',type:'plastic_bin',color:'#9a5ab0',size:'l',label:'宁夏CK NPK',source:'其他样地',location:'宁夏银川',coordinates:'38°13′N, 106°12′E',amendment:'化肥',amendmentAmount:'NPK',treatment:'CK/NPK',samplingDepth:'',amendmentDate:'2018',samplingDate:'2024.04',person:'梁新茹',samples:'',notes:'',status:'在库',stackParent:null},
-    {id:'r3c3',type:'woven_bag',color:'#e8e6e0',size:'m',label:'河南CK',source:'课题组样地',location:'河南豫东',coordinates:"33°58'N, 116°21'E",amendment:'BC',amendmentAmount:'1.33kg/m2',treatment:'CK',samplingDepth:'',amendmentDate:'2021.09',samplingDate:'2022.3.30',person:'任家琪',notes:'白色编织袋',status:'在库',stackParent:null},
-    {id:'r3c4',type:'woven_bag',color:'#5c6e4c',size:'s',label:'黑龙江绥化',source:'其他样地',location:'黑龙江绥化',coordinates:'',amendment:'BC+HF',amendmentAmount:'BC:4.7kg/plot',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'2025.10.17',person:'梁新茹、张云娴',notes:'',status:'在库',stackParent:null},
-    {id:'r3c5',type:'plastic_bag',color:'#b0b4c0',size:'s',label:'3-5',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r3c6',type:'plastic_bag',color:'#d0d4dc',size:'s',label:'3-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r3c5'},
-  ]},
-  {id:'L4',label:'第四层',containers:[
-    {id:'r4c1',type:'woven_bag',color:'#7a8e6a',size:'s',label:'4-1',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r4c2',type:'plastic_bin',color:'#a0c040',size:'l',label:'剖面',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'剖面',amendmentDate:'',samplingDate:'',person:'',samples:'剖面土样',notes:'',status:'在库',stackParent:null},
-    {id:'r4c3',type:'plastic_bag',color:'#d0d4dc',size:'s',label:'4-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r4c4',type:'plastic_bin',color:'#70b8d8',size:'l',label:'宁夏 2024.4',source:'其他样地',location:'宁夏银川',coordinates:'38°13′N, 106°12′E',amendment:'化肥',amendmentAmount:'',treatment:'HF',samplingDepth:'',amendmentDate:'',samplingDate:'2024.4',person:'',samples:'',notes:'',status:'在库',stackParent:null},
-    {id:'r4c5',type:'woven_bag',color:'#6b7f5a',size:'s',label:'4-5',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r4c6',type:'woven_bag',color:'#8a9a7a',size:'s',label:'4-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r4c5'},
-    {id:'r4c7',type:'woven_bag',color:'#c8c090',size:'m',label:'4-7',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-  ]},
-]};
-
-const _=()=>({id:mid(),type:'woven_bag',color:'#7a8e6a',size:'s',label:'',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null});
-
-const INIT2={id:'shelf2',name:'架4',levels:[
-  {id:'S2L1',label:'第一层',containers:[]},
-  {id:'S2L2',label:'第二层',containers:[
-    {..._(),id:'s2r2c1',color:'#6b7f5a',label:'2-1'},
-    {..._(),id:'s2r2c6',color:'#e8e6e0',size:'xs',label:'湖南消落带',location:'湖南',depth:2,depthParent:'s2r2c1'},
-    {..._(),id:'s2r2c7',color:'#c8b898',size:'s',label:'新疆石河子',location:'新疆石河子',depth:2,depthParent:'s2r2c1'},
-    {..._(),id:'s2r2c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'2-2'},
-    {..._(),id:'s2r2c3',color:'#7a8e6a',label:'2-3'},
-    {..._(),id:'s2r2c4',type:'plastic_bag',color:'#c4ccd8',label:'安徽池州CK',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'CK',amendment:'BC',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.3.39',person:'陈雅兰'},
-    {..._(),id:'s2r2c5',type:'plastic_bag',color:'#d0d4dc',label:'安徽池州BC',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'BC',amendment:'BC',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.3.39',person:'陈雅兰'},
-  ]},
-  {id:'S2L3',label:'第三层',containers:[
-    {..._(),id:'s2r3c1',type:'cardboard',color:'#b8956a',size:'m',label:'3-1'},
-    {..._(),id:'s2r3c2',color:'#e8e6e0',label:'3-2',notes:'白色编织袋'},
-    {..._(),id:'s2r3c3',color:'#d8d8d0',label:'3-3',notes:'白色编织袋',stackParent:'s2r3c2'},
-    {..._(),id:'s2r3c4',type:'plastic_bag',color:'#c4ccd8',label:'3-4'},
-    {..._(),id:'s2r3c5',color:'#5c6e4c',label:'3-5'},
-    {..._(),id:'s2r3c6',type:'plastic_bag',color:'#b0b4c0',label:'3-6'},
-    {..._(),id:'s2r3c7',color:'#8a9a7a',label:'3-7'},
-  ]},
-  {id:'S2L4',label:'第四层',containers:[
-    {..._(),id:'s2r4c1',size:'l',color:'#7a8e6a',label:'4-4-1'},
-    {..._(),id:'s2r4c2',size:'l',color:'#6b7f5a',label:'4-4-2'},
-    {..._(),id:'s2r4c3',size:'l',color:'#8a9a7a',label:'4-4-3'},
-    {..._(),id:'s2r4c4',size:'l',color:'#5c6e4c',label:'4-4-4'},
-  ]},
-]};
-
-const INIT3={id:'shelf3',name:'架1',levels:[
-  {id:'S3L1',label:'第一层',containers:[]},
-  {id:'S3L2',label:'第二层',containers:[]},
-  {id:'S3L3',label:'第三层',containers:[]},
-  {id:'S3L4',label:'第四层',containers:[]},
-]};
-
-const INIT4={id:'shelf4',name:'架2',levels:[
-  {id:'S4L1',label:'第一层',containers:[]},
-  {id:'S4L2',label:'第二层',containers:[
-    {..._(),id:'s4r2c1',color:'#7a8e6a',label:'4-2-1'},
-    {..._(),id:'s4r2c2',color:'#e8e6e0',label:'4-2-2',notes:'白色编织袋'},
-    {..._(),id:'s4r2c3',type:'plastic_bag',color:'#c4ccd8',label:'4-2-3'},
-  ]},
-  {id:'S4L3',label:'第三层',containers:[
-    {..._(),id:'s4r3c1',color:'#6b7f5a',size:'m',label:'4-3-1'},
-    {..._(),id:'s4r3c2',type:'plastic_bag',color:'#d0d4dc',label:'4-3-2',stackParent:'s4r3c1'},
-    {..._(),id:'s4r3c3',color:'#7a8e6a',size:'m',label:'宁夏微塑料',source:'课题组样地',location:'宁夏银川',coordinates:'',amendment:'BC+MP',amendmentAmount:'MP:0.27kg/m2',treatment:'MP',amendmentDate:'2021.04.24',samplingDate:'2025.10.16',person:'孙泽明、吕达'},
-    {..._(),id:'s4r3c4',color:'#e8e6e0',label:'4-3-4',notes:'白色编织袋'},
-    {..._(),id:'s4r3c5',color:'#5c6e4c',label:'4-3-5'},
-    {..._(),id:'s4r3c6',type:'plastic_bag',color:'#c4ccd8',label:'4-3-6'},
-  ]},
-  {id:'S4L4',label:'第四层',containers:[
-    {..._(),id:'s4r4c1',type:'cardboard',color:'#b8956a',size:'l',label:'宁夏炭+沈阳',location:'宁夏+沈阳',amendment:'BC',notes:'宁夏生物炭+沈阳'},
-    {..._(),id:'s4r4c2',type:'cardboard',color:'#a88558',size:'m',label:'宁夏',location:'宁夏'},
-    {..._(),id:'s4r4c3',color:'#7a8e6a',label:'4-4-3'},
-    {..._(),id:'s4r4c4',color:'#6b7f5a',label:'4-4-4'},
-  ]},
-]};
+const INIT_SHELVES=JSON.parse('[{"id":"shelf3","name":"架1","levels":[{"id":"S3L1","label":"第一层","containers":[]},{"id":"S3L2","label":"第二层","containers":[]},{"id":"S3L3","label":"第三层","containers":[]},{"id":"S3L4","label":"第四层","containers":[]}]},{"id":"shelf4","name":"架2","levels":[{"id":"S4L1","label":"第一层","containers":[]},{"id":"S4L2","label":"第二层","containers":[{"id":"s4r2c1","type":"woven_bag","color":"#7a8e6a","size":"s","label":"4-2-1","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s4r2c2","type":"woven_bag","color":"#e8e6e0","size":"s","label":"4-2-2","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"白色编织袋","status":"在库","stackParent":null},{"id":"s4r2c3","type":"plastic_bag","color":"#c4ccd8","size":"s","label":"4-2-3","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null}]},{"id":"S4L3","label":"第三层","containers":[{"id":"s4r3c1","type":"woven_bag","color":"#6b7f5a","size":"m","label":"4-3-1","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s4r3c2","type":"plastic_bag","color":"#d0d4dc","size":"s","label":"4-3-2","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":"s4r3c1"},{"id":"s4r3c3","type":"woven_bag","color":"#7a8e6a","size":"m","label":"宁夏微塑料","source":"课题组样地","location":"宁夏银川","coordinates":"","amendment":"BC+MP","amendmentAmount":"MP:0.27kg/m2","treatment":"CK/MP","samplingDepth":"","amendmentDate":"2021.04.24","samplingDate":"2025.10.16","person":"孙泽明、吕达","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s4r3c4","type":"woven_bag","color":"#e8e6e0","size":"s","label":"4-3-4","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"白色编织袋","status":"在库","stackParent":null},{"id":"s4r3c5","type":"woven_bag","color":"#5c6e4c","size":"s","label":"4-3-5","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s4r3c6","type":"plastic_bag","color":"#c4ccd8","size":"s","label":"4-3-6","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null}]},{"id":"S4L4","label":"第四层","containers":[{"id":"s4r4c1","type":"cardboard","color":"#b8956a","size":"l","label":"宁夏炭+沈阳","source":"","location":"宁夏+沈阳","coordinates":"","amendment":"BC","amendmentAmount":"","treatment":"BC","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"宁夏生物炭+沈阳","status":"在库","stackParent":null},{"id":"s4r4c2","type":"cardboard","color":"#a88558","size":"l","label":"宁夏","source":"","location":"宁夏","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s4r4c3","type":"woven_bag","color":"#7a8e6a","size":"s","label":"4-4-3","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s4r4c4","type":"woven_bag","color":"#6b7f5a","size":"s","label":"4-4-4","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null}]}]},{"id":"shelf1","name":"架3","levels":[{"id":"L1","label":"第一层","containers":[{"id":"r1c1","type":"plastic_bin","vis":"transparent_box","color":"#a8cce0","size":"l","label":"DCS","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"袋装土样","notes":"","status":"在库","stackParent":null},{"id":"r1c2","type":"plastic_bin","vis":"transparent_box","color":"#a8cce0","size":"l","label":"韩兰芳","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"袋装土样","notes":"","status":"在库","stackParent":null},{"id":"r1c3","type":"plastic_bin","vis":"transparent_box","color":"#b8d8ea","size":"l","label":"1-3","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"","notes":"","status":"在库","stackParent":null},{"id":"r1c4","type":"plastic_bin","vis":"transparent_box","color":"#a8cce0","size":"l","label":"1-4","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"","notes":"","status":"在库","stackParent":null},{"id":"r1c5","type":"plastic_bin","color":"#4a9a8a","size":"m","label":"九三垦区","source":"","location":"九三垦区","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"","notes":"青绿色收纳筐","status":"在库","stackParent":null}]},{"id":"L2","label":"第二层","containers":[{"id":"r2c1","type":"plastic_bag","color":"#c4ccd8","size":"s","label":"北京上庄","source":"课题组样地","location":"北京上庄","coordinates":"40°08′N, 116°10′E","amendment":"BC+HF","amendmentAmount":"BC:1.33kg/m2","treatment":"CK/BC/HF/BC+HF","samplingDepth":"","amendmentDate":"2021.09.10","samplingDate":"2023.11","person":"刘洁","notes":"","status":"在库","stackParent":null},{"id":"r2c2","type":"woven_bag","color":"#6b7f5a","size":"s","label":"2-2","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"r2c3","type":"woven_bag","color":"#8a9a7a","size":"s","label":"2-3","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":"r2c2"},{"id":"r2c4","type":"woven_bag","color":"#5c6e4c","size":"s","label":"2-4","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"r2c5","type":"woven_bag","color":"#e8e6e0","size":"m","label":"北京上庄","source":"课题组样地","location":"北京上庄","coordinates":"40°08′N, 116°10′E","amendment":"BC+HF","amendmentAmount":"BC:1.33kg/m2","treatment":"CK/BC/HF/BC+HF","samplingDepth":"","amendmentDate":"2021.09.10","samplingDate":"2022.21","person":"刘洁、任家琪","notes":"白色编织袋","status":"在库","stackParent":null},{"id":"r2c6","type":"woven_bag","color":"#9aaa8a","size":"m","label":"2-6","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"r2c7","type":"instrument","color":"#2a2a3a","size":"m","label":"PL-DY500","source":"非土样","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"—","notes":"紫外线老化箱","status":"在库","stackParent":null}]},{"id":"L3","label":"第三层","containers":[{"id":"r3c1","type":"woven_bag","color":"#7a8e6a","size":"s","label":"3-1","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"r3c2","type":"plastic_bin","color":"#9a5ab0","size":"l","label":"宁夏CK NPK","source":"其他样地","location":"宁夏银川","coordinates":"38°13′N, 106°12′E","amendment":"化肥","amendmentAmount":"NPK","treatment":"CK/HF","samplingDepth":"","amendmentDate":"2018","samplingDate":"2024.04","person":"梁新茹","samples":"","notes":"","status":"在库","stackParent":null},{"id":"r3c3","type":"woven_bag","color":"#e8e6e0","size":"m","label":"河南CK","source":"课题组样地","location":"河南豫东","coordinates":"33°58'N, 116°21'E","amendment":"BC","amendmentAmount":"1.33kg/m2","treatment":"CK","samplingDepth":"","amendmentDate":"2021.09","samplingDate":"2022.20","person":"任家琪","notes":"白色编织袋","status":"在库","stackParent":null},{"id":"r3c4","type":"woven_bag","color":"#5c6e4c","size":"s","label":"黑龙江绥化","source":"其他样地","location":"黑龙江绥化","coordinates":"","amendment":"BC+HF","amendmentAmount":"BC:4.7kg/plot","treatment":"CK/BC/HF/BC+HF","samplingDepth":"","amendmentDate":"","samplingDate":"2025.10.17","person":"梁新茹、张云娴","notes":"","status":"在库","stackParent":null},{"id":"r3c5","type":"plastic_bag","color":"#b0b4c0","size":"s","label":"3-5","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"r3c6","type":"plastic_bag","color":"#d0d4dc","size":"s","label":"3-6","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":"r3c5"}]},{"id":"L4","label":"第四层","containers":[{"id":"r4c1","type":"woven_bag","color":"#7a8e6a","size":"s","label":"4-1","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"r4c2","type":"plastic_bin","color":"#a0c040","size":"l","label":"剖面","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"剖面","amendmentDate":"","samplingDate":"","person":"","samples":"剖面土样","notes":"","status":"在库","stackParent":null},{"id":"r4c3","type":"plastic_bag","color":"#d0d4dc","size":"s","label":"4-3","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"r4c4","type":"plastic_bin","color":"#70b8d8","size":"l","label":"宁夏","source":"其他样地","location":"宁夏银川","coordinates":"38°13′N, 106°12′E","amendment":"化肥","amendmentAmount":"","treatment":"HF","samplingDepth":"","amendmentDate":"","samplingDate":"2024.4","person":"","samples":"","notes":"","status":"在库","stackParent":null},{"id":"r4c5","type":"woven_bag","color":"#6b7f5a","size":"s","label":"4-5","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"r4c6","type":"woven_bag","color":"#8a9a7a","size":"s","label":"4-6","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":"r4c5"},{"id":"r4c7","type":"woven_bag","color":"#c8c090","size":"m","label":"4-7","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null}]}]},{"id":"shelf2","name":"架4","levels":[{"id":"S2L1","label":"第一层","containers":[]},{"id":"S2L2","label":"第二层","containers":[{"id":"s2r2c1","type":"woven_bag","color":"#6b7f5a","size":"s","label":"2-1","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r2c6","type":"woven_bag","color":"#e8e6e0","size":"xs","label":"湖南消落带","source":"","location":"湖南","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null,"depth":2,"depthParent":"s2r2c1"},{"id":"s2r2c7","type":"woven_bag","color":"#c8b898","size":"s","label":"新疆石河子","source":"","location":"新疆石河子","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null,"depth":2,"depthParent":"s2r2c1"},{"id":"s2r2c2","type":"plastic_bin","color":"#a8cce0","size":"l","label":"2-2","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null,"vis":"transparent_box"},{"id":"s2r2c3","type":"woven_bag","color":"#7a8e6a","size":"s","label":"宁夏永宁望洪","source":"课题组样地","location":"宁夏永宁望洪","coordinates":"38°13′N, 106°12′E","amendment":"BC+HF","amendmentAmount":"BC:48t/ha","treatment":"CK/BC/HF/BC+HF","samplingDepth":"0-20/20-40","amendmentDate":"2022.04","samplingDate":"","person":"","samples":"#59-70","notes":"含CK、HF、BC、HF+BC等处理","status":"在库","stackParent":null},{"id":"s2r2c4","type":"plastic_bag","color":"#c4ccd8","size":"s","label":"安徽池州CK","source":"课题组样地","location":"安徽池州","coordinates":"30°33'N, 117°35'E","amendment":"BC","amendmentAmount":"1.33kg/m2","treatment":"CK","samplingDepth":"","amendmentDate":"2022.04.29","samplingDate":"2024.12.29","person":"陈雅兰","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r2c5","type":"plastic_bag","color":"#d0d4dc","size":"s","label":"安徽池州BC","source":"课题组样地","location":"安徽池州","coordinates":"30°33'N, 117°35'E","amendment":"BC","amendmentAmount":"1.33kg/m2","treatment":"BC","samplingDepth":"","amendmentDate":"2022.04.29","samplingDate":"2024.12.29","person":"陈雅兰","samples":"待确认","notes":"","status":"在库","stackParent":null}]},{"id":"S2L3","label":"第三层","containers":[{"id":"s2r3c1","type":"cardboard","color":"#b8956a","size":"m","label":"3-1","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r3c2","type":"woven_bag","color":"#e8e6e0","size":"s","label":"3-2","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"白色编织袋","status":"在库","stackParent":null},{"id":"s2r3c3","type":"woven_bag","color":"#d8d8d0","size":"s","label":"3-3","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"白色编织袋","status":"在库","stackParent":"s2r3c2"},{"id":"s2r3c4","type":"plastic_bag","color":"#c4ccd8","size":"s","label":"3-4","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r3c5","type":"woven_bag","color":"#5c6e4c","size":"s","label":"3-5","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r3c6","type":"plastic_bag","color":"#b0b4c0","size":"s","label":"3-6","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r3c7","type":"woven_bag","color":"#8a9a7a","size":"s","label":"3-7","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null}]},{"id":"S2L4","label":"第四层","containers":[{"id":"s2r4c1","type":"woven_bag","color":"#7a8e6a","size":"m","label":"4-4-1","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r4c2","type":"woven_bag","color":"#6b7f5a","size":"m","label":"4-4-2","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r4c3","type":"woven_bag","color":"#8a9a7a","size":"m","label":"4-4-3","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null},{"id":"s2r4c4","type":"woven_bag","color":"#5c6e4c","size":"m","label":"4-4-4","source":"","location":"","coordinates":"","amendment":"","amendmentAmount":"","treatment":"","samplingDepth":"","amendmentDate":"","samplingDate":"","person":"","samples":"待确认","notes":"","status":"在库","stackParent":null}]}]}]');
 
 let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',ftr:'',fdp:'',df:'',dt:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null,showTip:true,showFilter:false,depthOpen:[],detailMode:false};
 Object.defineProperty(S,'shelf',{get(){return S.shelves?S.shelves[S.shelfIdx]:null}});
 function save(){try{localStorage.setItem('sv7-s',JSON.stringify(S.shelves));localStorage.setItem('sv7-l',JSON.stringify(S.log));localStorage.setItem('sv7-h',JSON.stringify(S.hist))}catch{}}
-function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))]}
+function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=JSON.parse(JSON.stringify(INIT_SHELVES))}
 let lastSaved='';
 function commit(a,d){S.log=[{t:TS(),a,d},...S.log].slice(0,300);S.hist=[{t:TS(),s:JSON.parse(JSON.stringify(S.shelves))},...S.hist].slice(0,60);save();cloudPush().then(ok=>{if(ok){lastSaved=new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});const b=document.getElementById('save-status');if(b)b.textContent='☁ '+lastSaved+'已保存'}else{const b=document.getElementById('save-status');if(b)b.textContent='⚠ 保存失败'}})}
 function findC(id){for(const l of S.shelf.levels){const c=l.containers.find(x=>x.id===id);if(c)return{c,l}}return null}
@@ -356,6 +266,8 @@ function getLocs(){const s=new Set();allC().forEach(({c})=>{if(c.location)s.add(
 function getTreats(){const s=new Set();allC().forEach(({c})=>{if(c.treatment)s.add(c.treatment)});return[...s].sort()}
 function getChildOf(pid){for(const l of S.shelf.levels){const c=l.containers.find(x=>x.stackParent===pid);if(c)return{c,l}}return null}
 function normD(d){return(d||'').replace(/[^0-9]/g,'').padEnd(8,'0')}
+const TR_TAGS=['CK','BC','HF','MP','BC+HF','BC+MP','HF+MP'];
+function renderTreat(t){if(!t)return'—';return t.split('/').map(p=>p.trim()).filter(Boolean).map(p=>{const cls=p.includes('+')?p.split('+').map(x=>'tr-'+x).join(' '):('tr-'+p);return`<span class="tr-tag ${cls}">${esc(p)}</span>`}).join('')}
 function doSearch(){const q=S.sq.trim().toLowerCase(),ft=S.ft,fl=S.fl,fs=S.fs,ftr=S.ftr,fdp=S.fdp,df=S.df,dt=S.dt;if(!q&&!ft&&!fl&&!fs&&!ftr&&!fdp&&!df&&!dt){S.hits=[];return}S.hits=[];const dfn=normD(df),dtn=normD(dt);allC().forEach(({c})=>{let ok=true;if(ft&&c.type!==ft)ok=false;if(fl&&c.location!==fl)ok=false;if(fs&&c.status!==fs)ok=false;if(ftr&&c.treatment!==ftr)ok=false;if(fdp){const cd=String(c.depth||1);if(cd!==fdp)ok=false}if(q){const h=[c.label,c.location,c.amendment,c.treatment,c.person,c.samples,c.notes,c.source,c.coordinates,c.amendmentAmount,c.samplingDepth,c.samplingDate,c.amendmentDate].join(' ').toLowerCase();if(!h.includes(q))ok=false}if(df||dt){const sd=c.samplingDate;if(!sd){ok=false}else{const n=normD(sd);if(df&&n<dfn)ok=false;if(dt&&n>dtn)ok=false}}if(ok)S.hits.push(c.id)})}
 let tt=null;function toast(m){clearTimeout(tt);const e=document.getElementById('toast');if(e){e.textContent='✓ '+m;e.style.display='block';tt=setTimeout(()=>e.style.display='none',2000)}}
 
@@ -390,7 +302,7 @@ function render(){
     if(li<S.shelf.levels.length-1)shelfH+='<div class="sb"></div>';
   });
   document.getElementById('app').innerHTML=`
-    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.3.3</span><div class="hdr-r"><span id="save-status" class="btn bp hdr-save" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✅':'标签❌'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✅':'悬浮❌'}</button><button class="btn ${S.detailMode?'bp':'bg'}" onclick="togDetail()">${S.detailMode?'详情✅':'详情❌'}</button><button class="btn ${S.moveMode?'bor':'bg'}" onclick="togMove()">${S.moveMode?'移动中…':'移动'}</button><div class="exp-wrap"><button class="btn bg" onclick="togExport()">导出↓</button><div class="exp-menu" id="exp-menu" style="display:none"><button class="btn bg" onclick="showTable();hideExport()">表格 CSV</button><button class="btn bg" onclick="exportD();hideExport()">数据 JSON</button></div></div></div></div>
+    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.3.4</span><div class="hdr-r"><span id="save-status" class="btn bp hdr-save" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✅':'标签❌'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✅':'悬浮❌'}</button><button class="btn ${S.detailMode?'bp':'bg'}" onclick="togDetail()">${S.detailMode?'详情✅':'详情❌'}</button><button class="btn ${S.moveMode?'bor':'bg'}" onclick="togMove()">${S.moveMode?'移动中…':'移动'}</button><div class="exp-wrap"><button class="btn bg" onclick="togExport()">导出↓</button><div class="exp-menu" id="exp-menu" style="display:none"><button class="btn bg" onclick="showTable();hideExport()">表格 CSV</button><button class="btn bg" onclick="exportD();hideExport()">数据 JSON</button></div></div></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
       <button class="btn ${S.showFilter||hs?'bor':'bg'}" onclick="togFilter()" style="font-size:12px">${hs?'筛选('+S.hits.length+')':'⊞ 筛选'}</button>
       ${hs?`<button class="btn bg" style="padding:3px 8px;font-size:11px" onclick="clearSr()">✕</button>`:''}</div>
@@ -425,11 +337,11 @@ function render(){
     const t=TYPES[c.type]||{l:'?'};const tt=document.getElementById('tooltip');
     let h=`<div class="tt-n">${esc(c.label||'未命名')}</div><div class="tt-m">${t.l} · ${SL[c.size]||'中'} · ${esc(l.label)}</div>`;
     if(c.location)h+=`<div class="tt-r"><span class="tt-k">地点</span><span class="tt-v">${esc(c.location)}</span></div>`;
-    if(c.treatment)h+=`<div class="tt-r"><span class="tt-k">处理</span><span class="tt-v">${esc(c.treatment)}</span></div>`;
+    if(c.treatment)h+=`<div class="tt-r"><span class="tt-k">处理</span><span class="tt-v">${renderTreat(c.treatment)}</span></div>`;
     if(c.samplingDate)h+=`<div class="tt-r"><span class="tt-k">采样</span><span class="tt-v">${esc(c.samplingDate)}</span></div>`;
     if(c.person)h+=`<div class="tt-r"><span class="tt-k">负责人</span><span class="tt-v">${esc(c.person)}</span></div>`;
     if(c.notes)h+=`<div class="tt-r"><span class="tt-k">备注</span><span class="tt-v">${esc(c.notes)}</span></div>`;
-    tt.innerHTML=h;tt.style.display='block';
+    tt.innerHTML=h;tt.style.display='block';tt.style.border='2px solid var(--bd)';tt.style.pointerEvents='none';
     const r=el.getBoundingClientRect();
     tt.style.left=Math.max(8,Math.min(r.left,window.innerWidth-240))+'px';
     const below=r.bottom+8;tt.style.top=(below>window.innerHeight-120?r.top-tt.offsetHeight-8:below)+'px';
@@ -444,7 +356,7 @@ function render(){
   // Mobile: single tap = select, info button for details, badge uses touchstart
   if(isMob){
     let touchDrag=null;
-    // Container touch handler: tap=select, long-press=expand depth
+    // Container touch: tap=select/tooltip, long-press=show depth children in tooltip
     let lpTimer=null;
     document.querySelectorAll('.ct').forEach(el=>{
       el.addEventListener('touchstart',e=>{
@@ -458,24 +370,33 @@ function render(){
           touchDrag={cid,lvid:lvC?.dataset?.lv,startX:touch.clientX,startY:touch.clientY,el,ghost:null};
           return;
         }
-        // Long-press detection (500ms)
-        const dpGroup=el.closest('.dp-group');
-        if(dpGroup){
-          lpTimer=setTimeout(()=>{
-            lpTimer=null;
-            togDepth(cid);
-          },800);
-        }
-        // Detail mode: tap to show info panel
-        if(S.detailMode){
-          S.sel=cid;S.editing=false;S.adding=null;S.tab='info';render();return;
-        }
-        // Normal mode: highlight + tooltip
-        S.sel=cid;
-        render();
-        if(S.showTip){
-          setTimeout(()=>{const ne=document.querySelector('.ct[data-cid="'+cid+'"]');if(ne)showTip(ne)},60);
-        }
+        // Long-press: show behind containers in tooltip
+        const savedEl=el;
+        lpTimer=setTimeout(()=>{
+          lpTimer=null;
+          const behinds=[];
+          S.shelves.forEach(sh=>sh.levels.forEach(l=>l.containers.forEach(c=>{if(c.depthParent===cid)behinds.push(c)})));
+          if(!behinds.length)return;
+          const tt=document.getElementById('tooltip');
+          tt.style.border='2px dashed var(--acc)';
+          let h='<div class="tt-n">后排 '+behinds.length+'个</div>';
+          behinds.forEach(b=>{
+            h+='<div style="padding:6px 0;border-bottom:1px solid #eee;cursor:pointer" onclick="document.getElementById(\'tooltip\').style.display=\'none\';S.sel=\''+b.id+'\';S.detailMode=true;render()">';
+            h+='<b>'+esc(b.label)+'</b>';
+            if(b.location)h+=' · '+esc(b.location);
+            if(b.treatment)h+=' · '+esc(b.treatment);
+            h+='</div>';
+          });
+          tt.innerHTML=h;tt.style.display='block';tt.style.pointerEvents='auto';
+          const r=savedEl.getBoundingClientRect();
+          tt.style.left=Math.max(8,Math.min(r.left,window.innerWidth-220))+'px';
+          tt.style.top=Math.min(r.bottom+8,window.innerHeight-150)+'px';
+        },800);
+        // Detail mode
+        if(S.detailMode){S.sel=cid;S.editing=false;S.adding=null;S.tab='info';render();return}
+        // Normal: highlight + tooltip
+        S.sel=cid;render();
+        if(S.showTip){setTimeout(()=>{const ne=document.querySelector('.ct[data-cid="'+cid+'"]');if(ne)showTip(ne)},60)}
       },{passive:false});
       el.addEventListener('touchend',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null}});
       el.addEventListener('touchmove',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null}});
@@ -604,7 +525,7 @@ function renderPanel(){
     else if(sameLv.length)sk+=`<button class="btn bor" onclick="enterStk('${c.id}')">叠放到其他容器上…</button>`;
     else sk+='<div class="stk-info" style="color:var(--mt)">本层无可叠放目标</div>';sk+='</div>';
     return `<div class="ic"><div class="ic-n">${esc(c.label)}</div><div class="ic-m">${t.l} · ${SL[c.size]||'中'} · ${esc(l.label)}</div>
-      ${ir('地点',c.location)}${ir('经纬度',c.coordinates)}${ir('处理/添加',c.treatment||(c.amendment?c.amendment:''))}${ir('添加量',c.amendmentAmount)}${ir('深度',c.samplingDepth)}${ir('添加日期',c.amendmentDate)}${ir('采样日期',c.samplingDate)}${ir('负责人',c.person)}${ir('备注',c.notes)}${ir('状态',`<span style="color:${c.status==='在库'?'var(--grn)':'#b07020'}">${c.status||'在库'}</span>`)}
+      ${ir('地点',c.location)}${ir('经纬度',c.coordinates)}<div class="ir"><span class="ir-k">处理</span><span class="ir-v">${renderTreat(c.treatment||(c.amendment?c.amendment:''))}</span></div>${ir('添加量',c.amendmentAmount)}${ir('深度',c.samplingDepth)}${ir('添加日期',c.amendmentDate)}${ir('采样日期',c.samplingDate)}${ir('负责人',c.person)}${ir('备注',c.notes)}${ir('状态',`<span style="color:${c.status==='在库'?'var(--grn)':'#b07020'}">${c.status||'在库'}</span>`)}
       <div class="ia"><button class="btn bp" onclick="startEdit()">✎ 编辑</button><button class="btn bdn" onclick="delC()">✕ 删除</button></div>${sk}</div>`;
   }
   if(S.tab==='edit'){
@@ -614,7 +535,9 @@ function renderPanel(){
       <div class="fd"><label>类型</label><select id="ed-type">${Object.keys(TYPES).map(k=>`<option value="${k}" ${f.type===k?'selected':''}>${TYPES[k].l}</option>`).join('')}</select></div>
       <div class="fd"><label>尺寸</label><div class="szr">${SK.map(k=>`<button class="szb ${f.size===k?'on':''}" onclick="edSz('${k}')">${SL[k]}</button>`).join('')}</div></div>
       <div class="fd"><label>颜色</label><div class="cr">${(TYPES[f.type]?.cs||[]).map(c=>`<div class="cs ${f.color===c?'on':''}" style="background:${c}" onclick="edClr('${c}')"></div>`).join('')}</div></div>
-      ${ef('地点','location',f.location)}${ef('经纬度','coordinates',f.coordinates)}${ef('处理/添加','treatment',f.treatment,'CK / BC / 生物炭 / 微塑料…')}${ef('添加量','amendmentAmount',f.amendmentAmount)}${ef('采样深度','samplingDepth',f.samplingDepth,'0-20 / 剖面')}${ef('添加日期','amendmentDate',f.amendmentDate)}${ef('采样日期','samplingDate',f.samplingDate)}${ef('负责人','person',f.person)}${ef('前后层次','depth',f.depth||'','1=最前 2=后排 空=默认前排')}
+      ${ef('地点','location',f.location)}${ef('经纬度','coordinates',f.coordinates)}
+      <div class="fd"><label>处理</label><div class="tr-edit">${TR_TAGS.map(t=>{const cur=(f.treatment||'').split('/');const on=cur.includes(t);return`<span class="tr-tag tr-sel ${t.includes('+')?t.split('+').map(x=>'tr-'+x).join(' '):'tr-'+t} ${on?'on':''}" onclick="togTreat('${t}')">${t}</span>`}).join('')}</div><input type="hidden" id="ed-treat" value="${esc(f.treatment||'')}"></div>
+      ${ef('添加量','amendmentAmount',f.amendmentAmount)}${ef('采样深度','samplingDepth',f.samplingDepth,'0-20 / 剖面')}${ef('添加日期','amendmentDate',f.amendmentDate)}${ef('采样日期','samplingDate',f.samplingDate)}${ef('负责人','person',f.person)}${ef('前后层次','depth',f.depth||'','1=最前 2=后排 空=默认前排')}
       <div class="fd"><label>状态</label><select id="ed-st">${STATS.map(s=>`<option value="${s}" ${f.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
       ${ea('备注','notes',f.notes)}
       <div style="display:flex;gap:8px;margin-top:10px"><button class="btn bp" onclick="saveEd()">${S.adding?'✓ 添加':'✓ 保存'}</button><button class="btn bg" onclick="cancelEd()">取消</button></div></div>`;
@@ -712,6 +635,12 @@ window.togLabels=()=>{S.showLabels=!S.showLabels;render()};
 window.togTip=()=>{S.showTip=!S.showTip;render()};
 window.togFilter=()=>{S.showFilter=!S.showFilter;render()};
 window.togDetail=()=>{S.detailMode=!S.detailMode;if(!S.detailMode)S.sel=null;render()};
+window.togTreat=(tag)=>{
+  let cur=(S.ef.treatment||'').split('/').filter(Boolean);
+  if(tag==='CK'){cur=cur.includes('CK')?[]:[tag]}
+  else{cur=cur.filter(t=>t!=='CK');const i=cur.indexOf(tag);if(i>=0)cur.splice(i,1);else cur.push(tag)}
+  S.ef.treatment=cur.join('/');render();bindSel();
+};
 window.togExport=()=>{const m=document.getElementById('exp-menu');if(m)m.style.display=m.style.display==='none'?'flex':'none'};
 window.hideExport=()=>{const m=document.getElementById('exp-menu');if(m)m.style.display='none'};
 window.togDepth=id=>{const i=S.depthOpen.indexOf(id);if(i>=0)S.depthOpen.splice(i,1);else S.depthOpen.push(id);render()};
@@ -786,7 +715,7 @@ async function cloudPush(){
     render();toast('⚠ 离线模式，使用本地缓存');return;
   }
   // 3. 都没有 → 用初始数据，推送到GitHub
-  S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];
+  S.shelves=JSON.parse(JSON.stringify(INIT_SHELVES));
   save();render();
   const pushed=await cloudPush();
   toast(pushed?'☁ 初始数据已上传':'⚠ 使用本地数据');
@@ -807,7 +736,7 @@ window.checkLogPwd=()=>{
 // 每60秒静默拉取（GitHub API有速率限制，不宜太频繁）
 setInterval(()=>{cloudPull().then(ok=>{if(ok)render()})},60000);
 window.resetAll=async()=>{if(!confirm('重置所有数据？此操作不可撤回。'))return;
-  S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))];
+  S.shelves=JSON.parse(JSON.stringify(INIT_SHELVES));
   S.shelfIdx=0;S.log=[];S.hist=[];S.sel=null;save();render();
   // Re-fetch SHA to avoid conflict
   try{const r=await fetch(GH_API,{headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}});if(r.ok){const d=await r.json();fileSha=d.sha}}catch{}
