@@ -53,7 +53,6 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ct-b{width:100%;position:relative;overflow:visible}
 .ct-lb{font-size:11px;color:#444;text-align:center;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.3;font-weight:500;background:rgba(255,255,255,.92);border-radius:4px;padding:1px 4px;position:relative;z-index:5;box-shadow:0 1px 2px #0001}
 .dpb{position:absolute;top:1px;right:1px;background:#2a6ab0;color:#fff;font-size:7px;padding:0 3px;border-radius:2px;line-height:1.5;z-index:2}
-.ct-info-btn{display:none;position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;background:var(--acc);color:#fff;border-radius:50%;font-size:11px;text-align:center;line-height:18px;cursor:pointer;z-index:10;border:1.5px solid #fff;font-style:italic}
 .ct{position:relative;z-index:1}
 
 .dp-group{position:relative;flex-shrink:0}
@@ -207,7 +206,6 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .lv-c{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
   .lv-c::-webkit-scrollbar{display:none}
   .ct{margin:0}
-  .ct-info-btn{display:block}
   .ct-lb{font-size:9px}
   .sb{height:3px}
   .pn{width:100%;max-height:45vh;border-left:none;border-top:2px solid var(--bd);min-width:0}
@@ -343,7 +341,7 @@ const INIT4={id:'shelf4',name:'架2',levels:[
   ]},
 ]};
 
-let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',ftr:'',fdp:'',df:'',dt:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null,showTip:true,showFilter:false,depthOpen:[],panelOpen:false};
+let S={shelves:null,shelfIdx:0,sel:null,tab:'info',editing:false,adding:null,ef:{},log:[],hist:[],hidx:null,sq:'',ft:'',fl:'',fs:'',ftr:'',fdp:'',df:'',dt:'',hits:[],dcid:null,dlv:null,stkMode:false,showLabels:true,moveMode:false,moveSrc:null,showTip:true,showFilter:false,depthOpen:[],detailMode:false};
 Object.defineProperty(S,'shelf',{get(){return S.shelves?S.shelves[S.shelfIdx]:null}});
 function save(){try{localStorage.setItem('sv7-s',JSON.stringify(S.shelves));localStorage.setItem('sv7-l',JSON.stringify(S.log));localStorage.setItem('sv7-h',JSON.stringify(S.hist))}catch{}}
 function load(){try{const s=localStorage.getItem('sv7-s'),l=localStorage.getItem('sv7-l'),h=localStorage.getItem('sv7-h');if(s)S.shelves=JSON.parse(s);if(l)S.log=JSON.parse(l);if(h)S.hist=JSON.parse(h)}catch{}if(!S.shelves)S.shelves=[JSON.parse(JSON.stringify(INIT3)),JSON.parse(JSON.stringify(INIT4)),JSON.parse(JSON.stringify(INIT)),JSON.parse(JSON.stringify(INIT2))]}
@@ -390,7 +388,7 @@ function render(){
     if(li<S.shelf.levels.length-1)shelfH+='<div class="sb"></div>';
   });
   document.getElementById('app').innerHTML=`
-    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.2</span><div class="hdr-r"><span id="save-status" class="btn bp hdr-save" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✓':'标签✗'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✓':'悬浮✗'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button></div></div>
+    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.2</span><div class="hdr-r"><span id="save-status" class="btn bp hdr-save" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✅':'标签❌'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✅':'悬浮❌'}</button><button class="btn ${S.detailMode?'bp':'bg'}" onclick="togDetail()">${S.detailMode?'详情✅':'详情❌'}</button><button class="btn bg" onclick="showTable()">表格↓</button><button class="btn bg" onclick="exportD()">JSON↓</button></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
       <button class="btn ${S.showFilter||hs?'bor':'bg'}" onclick="togFilter()" style="font-size:12px">${hs?'筛选('+S.hits.length+')':'⊞ 筛选'}</button>
       ${hs?`<button class="btn bg" style="padding:3px 8px;font-size:11px" onclick="clearSr()">✕</button>`:''}</div>
@@ -403,7 +401,7 @@ function render(){
     </div>`:''}
     <div class="main"><div class="sa"><div class="st"><span style="color:var(--acc)">⊞</span>${S.shelves.map((sh,i)=>{const hc=hs?shelfHits(i):0;return`<button class="btn ${i===S.shelfIdx?'bp':'bg'}" style="padding:3px 12px;font-size:13px;position:relative" onclick="switchShelf(${i})">${esc(sh.name)}${hc?`<span style="position:absolute;top:-6px;right:-6px;background:var(--acc);color:#fff;font-size:9px;min-width:14px;height:14px;line-height:14px;text-align:center;border-radius:5px;padding:0 3px">${hc}</span>`:''}</button>`}).join('')}<span class="st-n">${hs?S.hits.length+'命中':allC().length+'个'}</span><button class="btn ${S.moveMode?'bor':'bg'}" style="padding:2px 8px;font-size:11px" onclick="togMove()">${S.moveMode?'移动中…':'✥移动'}</button>${S.stkMode?'<span style="color:var(--acc);font-size:12px;margin-left:4px">叠放→点目标</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="cancelStk()">取消</button>':''}${S.moveMode&&S.moveSrc?'<span style="color:#2a6ab0;font-size:12px">点击目标层</span><button class="btn bg" style="padding:2px 6px;font-size:11px" onclick="togMove()">取消</button>':''}</div>
       <div class="sf${S.showLabels?'':' hide-labels'}">${shelfH}<div class="sl"><div class="sleg"></div><div class="sleg"></div></div></div></div>
-      <div class="pn${S.panelOpen?'':' pn-closed'}"><div class="tb">${[['info','信息'],['edit','编辑'],['log','台账']].map(([k,v])=>`<button class="tbtn ${S.tab===k?'on':''}" onclick="stab('${k}')">${v}</button>`).join('')}<button class="tbtn pn-close" onclick="S.panelOpen=false;S.sel=null;render()">✕</button></div><div class="pb">${renderPanel()}</div></div></div>
+      <div class="pn${S.detailMode?'':' pn-closed'}"><div class="tb">${[['info','信息'],['edit','编辑'],['log','台账']].map(([k,v])=>`<button class="tbtn ${S.tab===k?'on':''}" onclick="stab('${k}')">${v}</button>`).join('')}<button class="tbtn pn-close" onclick="togDetail()">✕</button></div><div class="pb">${renderPanel()}</div></div></div>
     <div class="ftr">数据：GitHub/data.json（主） + 浏览器缓存（备） · 编辑自动保存</div>
     <div class="toast" id="toast" style="display:none"></div>
     <div class="tooltip" id="tooltip" style="display:none"></div>`;
@@ -444,7 +442,7 @@ function render(){
   // Mobile: single tap = select, info button for details, badge uses touchstart
   if(isMob){
     let touchDrag=null;
-    // Make badges work on mobile
+    // Badge touch handler
     document.querySelectorAll('.dpbadge').forEach(el=>{
       el.addEventListener('touchstart',e=>{
         e.stopPropagation();e.preventDefault();
@@ -452,14 +450,7 @@ function render(){
         if(m)togDepth(m[1]);
       },{passive:false});
     });
-    // Make info buttons work
-    document.querySelectorAll('.ct-info-btn').forEach(el=>{
-      el.addEventListener('touchstart',e=>{
-        e.stopPropagation();e.preventDefault();
-        const cid=el.dataset.for;
-        if(cid){S.sel=cid;S.editing=false;S.adding=null;S.tab='info';S.panelOpen=true;render()}
-      },{passive:false});
-    });
+    // Container touch handler
     document.querySelectorAll('.ct').forEach(el=>{
       el.addEventListener('touchstart',e=>{
         const cid=el.dataset.cid;if(!cid)return;
@@ -471,8 +462,14 @@ function render(){
           touchDrag={cid,lvid:lvC?.dataset?.lv,startX:touch.clientX,startY:touch.clientY,el,ghost:null};
           return;
         }
-        // Single tap: select container (highlight it)
-        S.sel=cid;render();
+        // Detail mode: tap to show info panel
+        if(S.detailMode){
+          S.sel=cid;S.editing=false;S.adding=null;S.tab='info';render();return;
+        }
+        // Normal mode: highlight + tooltip
+        S.sel=cid;
+        if(S.showTip){e.stopPropagation();showTip(el)}
+        render();
       },{passive:false});
     });
     // Touch drag handlers
@@ -530,6 +527,14 @@ function render(){
       }
       touchDrag=null;render();
     },{passive:false});
+    // Add button touch handler
+    document.querySelectorAll('.add-b').forEach(el=>{
+      el.addEventListener('touchstart',e=>{
+        e.stopPropagation();e.preventDefault();
+        const lv=el.closest('.lv-c')?.dataset?.lv;
+        if(lv)startAdd(lv);
+      },{passive:false});
+    });
     // Dismiss tooltip on background tap
     document.addEventListener('touchstart',e=>{
       if(!e.target.closest('.ct'))document.getElementById('tooltip').style.display='none';
@@ -570,7 +575,7 @@ function renderCtn(c,lv,ci,hs){
     ${ctnTop(c)}
     <div class="ct-b ${c.vis||c.type}" style="height:${sz.h}px;--cm:${cm};--cd:${cd};--cl:${cl}">${ctnInner(c)}</div>
     <div class="ct-lb" style="width:${sz.w}px">${esc(c.label.length>7?c.label.slice(0,6)+'…':c.label)}</div>
-    <div class="ct-info-btn" data-for="${c.id}">ℹ</div></div>`;
+    </div>`;
 }
 function renderStack(base,top,lv,hs){
   const szB=SZ[base.size]||SZ.m,szT=SZ[top.size]||SZ.m,w=Math.max(szB.w,szT.w);
@@ -706,6 +711,7 @@ window.switchShelf=i=>{S.shelfIdx=i;S.sel=null;S.editing=false;S.adding=null;S.s
 window.togLabels=()=>{S.showLabels=!S.showLabels;render()};
 window.togTip=()=>{S.showTip=!S.showTip;render()};
 window.togFilter=()=>{S.showFilter=!S.showFilter;render()};
+window.togDetail=()=>{S.detailMode=!S.detailMode;if(!S.detailMode)S.sel=null;render()};
 window.togDepth=id=>{const i=S.depthOpen.indexOf(id);if(i>=0)S.depthOpen.splice(i,1);else S.depthOpen.push(id);render()};
 window.showTable=()=>{
   const hdr=['来源','地点','经纬度','添加物','添加量','添加日期','采样日期','负责人','相对位置','容器类型','深度','备注','状态'];
