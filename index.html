@@ -57,7 +57,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ct{position:relative;z-index:1}
 
 .dp-group{position:relative;flex-shrink:0}
-.dpbadge{position:absolute;top:-8px;right:-8px;background:#2a6ab0;color:#fff;min-width:18px;height:18px;border-radius:6px;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;border:2px solid var(--sf);font-weight:500;padding:0 4px;transition:transform .15s}
+.dpbadge{position:absolute;top:2px;right:2px;background:#2a6ab0;color:#fff;min-width:18px;height:18px;border-radius:6px;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;border:2px solid var(--sf);font-weight:500;padding:0 4px;transition:transform .15s}
 .dpbadge:hover{transform:scale(1.15)}
 .dp-expand{position:absolute;top:100%;left:0;margin-top:6px;border:2px dashed var(--acc);border-radius:10px;padding:8px;background:var(--sf);z-index:20;display:flex;gap:6px;box-shadow:0 4px 16px #0002;min-width:max-content}
 
@@ -204,7 +204,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .st .btn{padding:3px 8px;font-size:11px}
   .lv{padding:3px 4px}
   .lv-l{font-size:12px;margin-bottom:5px}
-  .dpbadge{min-width:24px;height:24px;font-size:13px;top:-10px;right:-10px;border-radius:8px}
+  .dpbadge{min-width:26px;height:26px;font-size:14px;top:2px;right:2px;border-radius:8px;padding:0 5px}
   .lv-c{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
   .lv-c::-webkit-scrollbar{display:none}
   .ct{margin:0}
@@ -444,13 +444,6 @@ function render(){
   // Mobile: single tap = select, info button for details, badge uses touchstart
   if(isMob){
     let touchDrag=null;
-    // Document-level capture: badge and add-button FIRST, before anything else
-    document.addEventListener('touchstart',e=>{
-      const badge=e.target.closest('.dpbadge');
-      if(badge){e.stopPropagation();e.preventDefault();const a=badge.getAttribute('onclick')||'';const m=a.match(/togDepth\('([^']+)'\)/);if(m)togDepth(m[1]);return}
-      const addBtn=e.target.closest('.add-b');
-      if(addBtn){e.stopPropagation();e.preventDefault();const lv=addBtn.closest('.lv-c')?.dataset?.lv;if(lv)startAdd(lv);return}
-    },{passive:false,capture:true});
     // Container touch handler
     document.querySelectorAll('.ct').forEach(el=>{
       el.addEventListener('touchstart',e=>{
@@ -812,6 +805,15 @@ window.resetAll=async()=>{if(!confirm('重置所有数据？此操作不可撤�
 window.exportD=()=>{const d=JSON.stringify({shelves:S.shelves,log:S.log,hist:S.hist},null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='soil-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('已导出')};
 window.importD=()=>{const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.shelves){S.shelves=d.shelves;S.shelfIdx=0;if(d.log)S.log=d.log;if(d.hist)S.hist=d.hist;save();render();toast('已导入')}else if(d.shelf){S.shelves=[d.shelf];S.shelfIdx=0;save();render();toast('已导入(旧格式)')}else toast('格式错误')}catch{toast('解析失败')}};r.readAsText(f)};inp.click()};
 load();render();
+// One-time mobile touch handler for badges and add buttons (capture phase)
+if('ontouchstart'in window||navigator.maxTouchPoints>0){
+  document.addEventListener('touchstart',e=>{
+    const badge=e.target.closest('.dpbadge');
+    if(badge){e.stopPropagation();e.preventDefault();const a=badge.getAttribute('onclick')||'';const m=a.match(/togDepth\('([^']+)'\)/);if(m)togDepth(m[1]);return}
+    const addBtn=e.target.closest('.add-b');
+    if(addBtn){e.stopPropagation();e.preventDefault();const lv=addBtn.closest('.lv-c')?.dataset?.lv;if(lv)startAdd(lv);return}
+  },{passive:false,capture:true});
+}
 </script>
 </body>
 </html>
