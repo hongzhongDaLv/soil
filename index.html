@@ -203,9 +203,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   .st{flex-wrap:wrap;gap:4px;font-size:13px;margin-bottom:4px}
   .st .btn{padding:3px 8px;font-size:11px}
   .lv{padding:3px 4px}
-  .lv-l{font-size:12px;margin-bottom:5px}
+  .lv-l{font-size:15px;margin-bottom:6px}
   .dpbadge{top:-6px;right:-6px}
-  .lv-c{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
+  .lv-c{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 2px 6px;scrollbar-width:none}
   .lv-c::-webkit-scrollbar{display:none}
   .ct{margin:0}
   .ct-lb{font-size:14px}
@@ -260,14 +260,14 @@ const INIT={id:'shelf1',name:'架3',levels:[
     {id:'r2c2',type:'woven_bag',color:'#6b7f5a',size:'s',label:'2-2',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r2c3',type:'woven_bag',color:'#8a9a7a',size:'s',label:'2-3',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r2c2'},
     {id:'r2c4',type:'woven_bag',color:'#5c6e4c',size:'s',label:'2-4',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
-    {id:'r2c5',type:'woven_bag',color:'#e8e6e0',size:'m',label:'北京上庄',source:'课题组样地',location:'北京上庄',coordinates:'40°08′N, 116°10′E',amendment:'BC+HF',amendmentAmount:'BC:1.33kg/m2',treatment:'BC+HF',samplingDepth:'',amendmentDate:'2021.09.10',samplingDate:'2022.3.21',person:'刘洁、任家琪',notes:'白色编织袋',status:'在库',stackParent:null},
+    {id:'r2c5',type:'woven_bag',color:'#e8e6e0',size:'m',label:'北京上庄',source:'课题组样地',location:'北京上庄',coordinates:'40°08′N, 116°10′E',amendment:'BC+HF',amendmentAmount:'BC:1.33kg/m2',treatment:'BC+HF',samplingDepth:'',amendmentDate:'2021.09.10',samplingDate:'2022.3.31',person:'刘洁、任家琪',notes:'白色编织袋',status:'在库',stackParent:null},
     {id:'r2c6',type:'woven_bag',color:'#9aaa8a',size:'m',label:'2-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r2c7',type:'instrument',color:'#2a2a3a',size:'m',label:'PL-DY500',source:'非土样',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'—',notes:'紫外线老化箱',status:'在库',stackParent:null},
   ]},
   {id:'L3',label:'第三层',containers:[
     {id:'r3c1',type:'woven_bag',color:'#7a8e6a',size:'s',label:'3-1',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r3c2',type:'plastic_bin',color:'#9a5ab0',size:'l',label:'宁夏CK NPK',source:'其他样地',location:'宁夏银川',coordinates:'38°13′N, 106°12′E',amendment:'化肥',amendmentAmount:'NPK',treatment:'CK/NPK',samplingDepth:'',amendmentDate:'2018',samplingDate:'2024.04',person:'梁新茹',samples:'',notes:'',status:'在库',stackParent:null},
-    {id:'r3c3',type:'woven_bag',color:'#e8e6e0',size:'m',label:'河南CK',source:'课题组样地',location:'河南豫东',coordinates:"33°58'N, 116°21'E",amendment:'BC',amendmentAmount:'1.33kg/m2',treatment:'CK',samplingDepth:'',amendmentDate:'2021.09',samplingDate:'2022.3.20',person:'任家琪',notes:'白色编织袋',status:'在库',stackParent:null},
+    {id:'r3c3',type:'woven_bag',color:'#e8e6e0',size:'m',label:'河南CK',source:'课题组样地',location:'河南豫东',coordinates:"33°58'N, 116°21'E",amendment:'BC',amendmentAmount:'1.33kg/m2',treatment:'CK',samplingDepth:'',amendmentDate:'2021.09',samplingDate:'2022.3.30',person:'任家琪',notes:'白色编织袋',status:'在库',stackParent:null},
     {id:'r3c4',type:'woven_bag',color:'#5c6e4c',size:'s',label:'黑龙江绥化',source:'其他样地',location:'黑龙江绥化',coordinates:'',amendment:'BC+HF',amendmentAmount:'BC:4.7kg/plot',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'2025.10.17',person:'梁新茹、张云娴',notes:'',status:'在库',stackParent:null},
     {id:'r3c5',type:'plastic_bag',color:'#b0b4c0',size:'s',label:'3-5',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:null},
     {id:'r3c6',type:'plastic_bag',color:'#d0d4dc',size:'s',label:'3-6',source:'',location:'',coordinates:'',amendment:'',amendmentAmount:'',treatment:'',samplingDepth:'',amendmentDate:'',samplingDate:'',person:'',samples:'待确认',notes:'',status:'在库',stackParent:'r3c5'},
@@ -293,8 +293,8 @@ const INIT2={id:'shelf2',name:'架4',levels:[
     {..._(),id:'s2r2c7',color:'#c8b898',size:'s',label:'新疆石河子',location:'新疆石河子',depth:2,depthParent:'s2r2c1'},
     {..._(),id:'s2r2c2',type:'plastic_bin',vis:'transparent_box',color:'#a8cce0',size:'l',label:'2-2'},
     {..._(),id:'s2r2c3',color:'#7a8e6a',label:'2-3'},
-    {..._(),id:'s2r2c4',type:'plastic_bag',color:'#c4ccd8',label:'安徽池州CK',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'CK',amendment:'BC',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.3.29',person:'陈雅兰'},
-    {..._(),id:'s2r2c5',type:'plastic_bag',color:'#d0d4dc',label:'安徽池州BC',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'BC',amendment:'BC',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.3.29',person:'陈雅兰'},
+    {..._(),id:'s2r2c4',type:'plastic_bag',color:'#c4ccd8',label:'安徽池州CK',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'CK',amendment:'BC',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.3.39',person:'陈雅兰'},
+    {..._(),id:'s2r2c5',type:'plastic_bag',color:'#d0d4dc',label:'安徽池州BC',source:'课题组样地',location:'安徽池州',coordinates:"30°33'N, 117°35'E",treatment:'BC',amendment:'BC',amendmentAmount:'1.33kg/m2',amendmentDate:'2022.04.29',samplingDate:'2024.12.3.39',person:'陈雅兰'},
   ]},
   {id:'S2L3',label:'第三层',containers:[
     {..._(),id:'s2r3c1',type:'cardboard',color:'#b8956a',size:'m',label:'3-1'},
@@ -390,7 +390,7 @@ function render(){
     if(li<S.shelf.levels.length-1)shelfH+='<div class="sb"></div>';
   });
   document.getElementById('app').innerHTML=`
-    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.3.2</span><div class="hdr-r"><span id="save-status" class="btn bp hdr-save" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✅':'标签❌'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✅':'悬浮❌'}</button><button class="btn ${S.detailMode?'bp':'bg'}" onclick="togDetail()">${S.detailMode?'详情✅':'详情❌'}</button><button class="btn ${S.moveMode?'bor':'bg'}" onclick="togMove()">${S.moveMode?'移动中…':'移动'}</button><div class="exp-wrap"><button class="btn bg" onclick="togExport()">导出↓</button><div class="exp-menu" id="exp-menu" style="display:none"><button class="btn bg" onclick="showTable();hideExport()">表格 CSV</button><button class="btn bg" onclick="exportD();hideExport()">数据 JSON</button></div></div></div></div>
+    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.3.3</span><div class="hdr-r"><span id="save-status" class="btn bp hdr-save" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✅':'标签❌'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✅':'悬浮❌'}</button><button class="btn ${S.detailMode?'bp':'bg'}" onclick="togDetail()">${S.detailMode?'详情✅':'详情❌'}</button><button class="btn ${S.moveMode?'bor':'bg'}" onclick="togMove()">${S.moveMode?'移动中…':'移动'}</button><div class="exp-wrap"><button class="btn bg" onclick="togExport()">导出↓</button><div class="exp-menu" id="exp-menu" style="display:none"><button class="btn bg" onclick="showTable();hideExport()">表格 CSV</button><button class="btn bg" onclick="exportD();hideExport()">数据 JSON</button></div></div></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
       <button class="btn ${S.showFilter||hs?'bor':'bg'}" onclick="togFilter()" style="font-size:12px">${hs?'筛选('+S.hits.length+')':'⊞ 筛选'}</button>
       ${hs?`<button class="btn bg" style="padding:3px 8px;font-size:11px" onclick="clearSr()">✕</button>`:''}</div>
