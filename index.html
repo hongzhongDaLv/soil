@@ -63,7 +63,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .tr-edit{display:flex;flex-wrap:wrap;gap:4px;padding:4px 0}
 .dpbadge{position:absolute;top:-6px;right:-6px;background:#2a6ab0;color:#fff;min-width:18px;height:18px;border-radius:6px;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;border:2px solid var(--sf);font-weight:500;padding:0 4px;transition:transform .15s}
 .dpbadge:hover{transform:scale(1.15)}
-.dp-expand{position:absolute;top:100%;left:0;margin-top:6px;border:2px dashed var(--acc);border-radius:10px;padding:8px;background:var(--sf);z-index:20;display:flex;gap:6px;box-shadow:0 4px 16px #0002;min-width:max-content}
+.dp-expand{position:fixed;border:2px dashed var(--acc);border-radius:10px;padding:8px;background:var(--sf);z-index:50;display:flex;gap:6px;box-shadow:0 4px 16px #0002;min-width:max-content;max-width:90vw}
 
 
 /* Stack */
@@ -302,7 +302,7 @@ function render(){
     if(li<S.shelf.levels.length-1)shelfH+='<div class="sb"></div>';
   });
   document.getElementById('app').innerHTML=`
-    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.3.4</span><div class="hdr-r"><span id="save-status" class="btn bp hdr-save" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✅':'标签❌'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✅':'悬浮❌'}</button><button class="btn ${S.detailMode?'bp':'bg'}" onclick="togDetail()">${S.detailMode?'详情✅':'详情❌'}</button><button class="btn ${S.moveMode?'bor':'bg'}" onclick="togMove()">${S.moveMode?'移动中…':'移动'}</button><div class="exp-wrap"><button class="btn bg" onclick="togExport()">导出↓</button><div class="exp-menu" id="exp-menu" style="display:none"><button class="btn bg" onclick="showTable();hideExport()">表格 CSV</button><button class="btn bg" onclick="exportD();hideExport()">数据 JSON</button></div></div></div></div>
+    <div class="hdr"><span style="font-size:20px;color:var(--acc)">▦</span><span class="hdr-t">土样管理系统</span><span class="hdr-b">2.3.4.1</span><div class="hdr-r"><span id="save-status" class="btn bp hdr-save" onclick="manualSave()" style="cursor:pointer">${lastSaved?'☁ '+lastSaved+'已保存':'☁ 保存'}</span><button class="btn ${S.showLabels?'bp':'bg'}" onclick="togLabels()">${S.showLabels?'标签✅':'标签❌'}</button><button class="btn ${S.showTip?'bp':'bg'}" onclick="togTip()">${S.showTip?'悬浮✅':'悬浮❌'}</button><button class="btn ${S.detailMode?'bp':'bg'}" onclick="togDetail()">${S.detailMode?'详情✅':'详情❌'}</button><button class="btn ${S.moveMode?'bor':'bg'}" onclick="togMove()">${S.moveMode?'移动中…':'移动'}</button><div class="exp-wrap"><button class="btn bg" onclick="togExport()">导出↓</button><div class="exp-menu" id="exp-menu" style="display:none"><button class="btn bg" onclick="showTable();hideExport()">表格 CSV</button><button class="btn bg" onclick="exportD();hideExport()">数据 JSON</button></div></div></div></div>
     <div class="sbar"><span style="color:var(--acc);font-size:16px">⌕</span><div class="sbar-w"><input id="si" placeholder="搜索：地点、处理、负责人…" value="${esc(S.sq)}"></div>
       <button class="btn ${S.showFilter||hs?'bor':'bg'}" onclick="togFilter()" style="font-size:12px">${hs?'筛选('+S.hits.length+')':'⊞ 筛选'}</button>
       ${hs?`<button class="btn bg" style="padding:3px 8px;font-size:11px" onclick="clearSr()">✕</button>`:''}</div>
@@ -362,7 +362,6 @@ function render(){
       el.addEventListener('touchstart',e=>{
         const cid=el.dataset.cid;if(!cid)return;
         document.getElementById('tooltip').style.display='none';
-        clearTimeout(lpTimer);
         if(S.moveMode){
           e.preventDefault();
           const touch=e.touches[0];
@@ -370,36 +369,10 @@ function render(){
           touchDrag={cid,lvid:lvC?.dataset?.lv,startX:touch.clientX,startY:touch.clientY,el,ghost:null};
           return;
         }
-        // Long-press: show behind containers in tooltip
-        lpTimer=setTimeout(()=>{
-          lpTimer=null;
-          const behinds=[];
-          S.shelves.forEach(sh=>sh.levels.forEach(l=>l.containers.forEach(c=>{if(c.depthParent===cid)behinds.push(c)})));
-          if(!behinds.length)return;
-          const tt=document.getElementById('tooltip');
-          tt.style.border='2px dashed var(--acc)';
-          let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span class="tt-n" style="margin:0">后排 '+behinds.length+'个</span><span onclick="document.getElementById(\'tooltip\').style.display=\'none\'" style="cursor:pointer;font-size:16px;color:var(--mt)">✕</span></div>';
-          behinds.forEach(b=>{
-            h+='<div style="padding:8px;margin:4px 0;background:var(--sf2);border-radius:8px;cursor:pointer" onclick="document.getElementById(\'tooltip\').style.display=\'none\';S.sel=\''+b.id+'\';S.detailMode=true;render()">';
-            h+='<div style="font-weight:bold;margin-bottom:2px">'+esc(b.label)+'</div>';
-            if(b.location)h+='<div style="font-size:12px;color:var(--mt)">'+esc(b.location)+'</div>';
-            if(b.treatment)h+='<div style="margin-top:4px">'+renderTreat(b.treatment)+'</div>';
-            h+='</div>';
-          });
-          tt.innerHTML=h;tt.style.display='block';tt.style.pointerEvents='auto';
-          // Find element in current DOM
-          const curEl=document.querySelector('.ct[data-cid="'+cid+'"]');
-          if(curEl){const r=curEl.getBoundingClientRect();tt.style.left=Math.max(8,Math.min(r.left,window.innerWidth-220))+'px';tt.style.top=Math.min(r.bottom+8,window.innerHeight-200)+'px'}
-          else{tt.style.left='20px';tt.style.top='40%'}
-        },800);
-        // Detail mode
         if(S.detailMode){S.sel=cid;S.editing=false;S.adding=null;S.tab='info';render();return}
-        // Normal: highlight + tooltip
         S.sel=cid;render();
         if(S.showTip){setTimeout(()=>{const ne=document.querySelector('.ct[data-cid="'+cid+'"]');if(ne)showTip(ne)},60)}
       },{passive:false});
-      el.addEventListener('touchend',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null}});
-      el.addEventListener('touchmove',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null}});
     });
     // Touch drag handlers
     document.addEventListener('touchmove',e=>{
@@ -458,13 +431,16 @@ function render(){
     },{passive:false});
     // Dismiss tooltip on background tap
     document.addEventListener('touchstart',e=>{
-      if(!e.target.closest('.ct')&&!e.target.closest('.tooltip'))document.getElementById('tooltip').style.display='none';
+      if(!e.target.closest('.ct')&&!e.target.closest('.tooltip')&&!e.target.closest('.dp-expand')&&!e.target.closest('.dpbadge'))document.getElementById('tooltip').style.display='none';
     },{passive:true});
   }
   // Restore scroll positions
   const newSa=document.querySelector('.sa');if(newSa)newSa.scrollTop=saTop;
   document.querySelectorAll('.lv-c').forEach(el=>{if(el.dataset.lv&&lvScrolls[el.dataset.lv])el.scrollLeft=lvScrolls[el.dataset.lv]});
-  setTimeout(()=>{const s=document.querySelector('.sa');if(s)s.scrollTop=saTop;document.querySelectorAll('.lv-c').forEach(el=>{if(el.dataset.lv&&lvScrolls[el.dataset.lv])el.scrollLeft=lvScrolls[el.dataset.lv]})},50);
+  setTimeout(()=>{const s=document.querySelector('.sa');if(s)s.scrollTop=saTop;document.querySelectorAll('.lv-c').forEach(el=>{if(el.dataset.lv&&lvScrolls[el.dataset.lv])el.scrollLeft=lvScrolls[el.dataset.lv]});
+    // Position fixed dp-expand boxes
+    document.querySelectorAll('.dp-group').forEach(g=>{const ex=g.querySelector('.dp-expand');if(ex){const r=g.getBoundingClientRect();ex.style.left=Math.max(4,Math.min(r.left,window.innerWidth-200))+'px';ex.style.top=Math.min(r.bottom+4,window.innerHeight-100)+'px'}});
+  },50);
 }
 
 function renderShelfOnly(){doSearch();const hs=S.sq||S.ft||S.fl||S.fs||S.ftr||S.fdp||S.df||S.dt;document.querySelectorAll('.ct').forEach(el=>{const cid=el.dataset.cid;if(!cid)return;el.classList.toggle('srhit',hs&&S.hits.includes(cid));el.classList.toggle('dim',hs&&!S.hits.includes(cid))})}
@@ -746,6 +722,15 @@ window.resetAll=async()=>{if(!confirm('重置所有数据？此操作不可撤�
 window.exportD=()=>{const d=JSON.stringify({shelves:S.shelves,log:S.log,hist:S.hist},null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='soil-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('已导出')};
 window.importD=()=>{const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.shelves){S.shelves=d.shelves;S.shelfIdx=0;if(d.log)S.log=d.log;if(d.hist)S.hist=d.hist;save();render();toast('已导入')}else if(d.shelf){S.shelves=[d.shelf];S.shelfIdx=0;save();render();toast('已导入(旧格式)')}else toast('格式错误')}catch{toast('解析失败')}};r.readAsText(f)};inp.click()};
 load();render();
+// Mobile: capture-phase handler for badge and add button (runs once, not per render)
+if('ontouchstart'in window||navigator.maxTouchPoints>0){
+  document.addEventListener('touchend',e=>{
+    const badge=e.target.closest('.dpbadge');
+    if(badge){e.stopPropagation();e.preventDefault();const a=badge.getAttribute('onclick')||'';const m=a.match(/togDepth\('([^']+)'\)/);if(m){togDepth(m[1])}return}
+    const addBtn=e.target.closest('.add-b');
+    if(addBtn){e.stopPropagation();e.preventDefault();const lv=addBtn.closest('.lv-c')?.dataset?.lv;if(lv)startAdd(lv);return}
+  },{capture:true});
+}
 </script>
 </body>
 </html>
