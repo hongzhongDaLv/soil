@@ -444,15 +444,13 @@ function render(){
   // Mobile: single tap = select, info button for details, badge uses touchstart
   if(isMob){
     let touchDrag=null;
-    // Badge touch handler
-    document.querySelectorAll('.dpbadge').forEach(el=>{
-      el.addEventListener('touchstart',e=>{
-        e.stopPropagation();e.preventDefault();
-        const attr=el.getAttribute('onclick')||'';
-        const m=attr.match(/togDepth\('([^']+)'\)/);
-        if(m)togDepth(m[1]);
-      },{passive:false});
-    });
+    // Document-level capture: badge and add-button FIRST, before anything else
+    document.addEventListener('touchstart',e=>{
+      const badge=e.target.closest('.dpbadge');
+      if(badge){e.stopPropagation();e.preventDefault();const a=badge.getAttribute('onclick')||'';const m=a.match(/togDepth\('([^']+)'\)/);if(m)togDepth(m[1]);return}
+      const addBtn=e.target.closest('.add-b');
+      if(addBtn){e.stopPropagation();e.preventDefault();const lv=addBtn.closest('.lv-c')?.dataset?.lv;if(lv)startAdd(lv);return}
+    },{passive:false,capture:true});
     // Container touch handler
     document.querySelectorAll('.ct').forEach(el=>{
       el.addEventListener('touchstart',e=>{
@@ -532,14 +530,6 @@ function render(){
       }
       touchDrag=null;render();
     },{passive:false});
-    // Add button touch handler
-    document.querySelectorAll('.add-b').forEach(el=>{
-      el.addEventListener('touchstart',e=>{
-        e.stopPropagation();e.preventDefault();
-        const lv=el.closest('.lv-c')?.dataset?.lv;
-        if(lv)startAdd(lv);
-      },{passive:false});
-    });
     // Dismiss tooltip on background tap
     document.addEventListener('touchstart',e=>{
       if(!e.target.closest('.ct'))document.getElementById('tooltip').style.display='none';
