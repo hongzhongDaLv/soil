@@ -368,7 +368,7 @@ function render(){
     const photoSrc=shelf.shelfPhoto?SHELF_PHOTOS[shelf.shelfPhoto]:null;
     if(photoSrc&&c.photoRect){
       const[px,py,pw,ph]=c.photoRect.split(',').map(Number);
-      h+=`<div style="margin-top:6px;position:relative;border-radius:4px;overflow:hidden"><img src="${photoSrc}" style="width:100%;display:block;opacity:0.5"><div style="position:absolute;left:${px}%;top:${py}%;width:${pw}%;height:${ph}%;border:2px solid #0f0;border-radius:2px;box-shadow:0 0 0 9999px rgba(0,0,0,0.4)"></div></div>`;
+      h+=`<div style="margin-top:6px;position:relative;border-radius:4px;overflow:hidden;max-width:150px"><img src="${photoSrc}" style="width:100%;display:block"><div style="position:absolute;left:${px}%;top:${py}%;width:${pw}%;height:${ph}%;border:2px solid #0f0;border-radius:2px;box-shadow:0 0 0 9999px rgba(0,0,0,0.4)"></div></div>`;
     }
     tt.innerHTML=h;tt.style.display='block';tt.style.border='2px solid var(--bd)';tt.style.pointerEvents='none';
     const r=el.getBoundingClientRect();
@@ -536,7 +536,7 @@ function renderPanel(){
     let photoH='';
     if(photoSrc&&pr){
       const[px,py,pw,ph]=pr.split(',').map(Number);
-      photoH=`<div class="pv"><div class="pv-t">实物位置</div><div class="pv-img"><img src="${photoSrc}"><div class="pv-mask"></div><div class="pv-rect" style="left:${px}%;top:${py}%;width:${pw}%;height:${ph}%"><span class="pv-lbl">${esc(c.label)}</span></div></div></div>`;
+      photoH=`<div class="pv"><div class="pv-t">实物位置</div><div class="pv-img" style="max-width:280px"><img src="${photoSrc}"><div class="pv-mask"></div><div class="pv-rect" style="left:${px}%;top:${py}%;width:${pw}%;height:${ph}%"><span class="pv-lbl">${esc(c.label)}</span></div></div></div>`;
     }
     return `<div class="ic"><div class="ic-n">${esc(c.label)}</div><div class="ic-m">${t.l} · ${SL[c.size]||'中'} · ${esc(l.label)}</div>
       <div class="ir"><span class="ir-k">地点</span><span class="ir-v">${renderLoc(c.location,c.coordinates)}</span></div><div class="ir"><span class="ir-k">处理</span><span class="ir-v">${renderTreat(c.treatment||(c.amendment?c.amendment:''))}</span></div>${ir('添加量',c.amendmentAmount)}${ir('深度',c.samplingDepth)}${ir('添加日期',c.amendmentDate)}${ir('采样日期',c.samplingDate)}${ir('负责人',c.person)}${ir('备注',c.notes)}${ir('状态',`<span style="color:${c.status==='在库'?'var(--grn)':'#b07020'}">${c.status||'在库'}</span>`)}
