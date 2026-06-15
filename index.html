@@ -534,22 +534,14 @@ function renderPanel(){
     const f=findC(S.sel);if(!f)return '<div class="empty">未找到</div>';const{c,l}=f,t=TYPES[c.type]||{l:'?'};
     const child=getChildOf(c.id),parentC=c.stackParent?findC(c.stackParent):null;
     const sameLv=l.containers.filter(x=>x.id!==c.id&&!x.stackParent&&x.id!==(c.stackParent||''));
-    let sk='<div class="stk-ctrl"><div class="stk-ctrl-t">叠放管理</div>';
-    if(c.stackParent&&parentC)sk+=`<div class="stk-info">叠放在「${esc(parentC.c.label)}」上方</div><button class="btn bor" onclick="unstack('${c.id}')">取消叠放</button>`;
-    else if(child)sk+=`<div class="stk-info">「${esc(child.c.label)}」在上方</div><button class="btn bor" onclick="unstack('${child.c.id}')">取消叠放</button>`;
-    else if(sameLv.length)sk+=`<button class="btn bor" onclick="enterStk('${c.id}')">叠放到其他容器上…</button>`;
-    else sk+='<div class="stk-info" style="color:var(--mt)">本层无可叠放目标</div>';sk+='</div>';
-    // Depth management
-    let dk='<div class="stk-ctrl"><div class="stk-ctrl-t">前后管理</div>';
-    if(c.depthParent){
-      const parent=allC().find(x=>x.c.id===c.depthParent);
-      dk+=`<div class="stk-info">在「${parent?esc(parent.c.label):c.depthParent}」后面</div><button class="btn bor" onclick="unDepth('${c.id}')">取消后排</button>`;
-    }else if(S.depthMode){
-      dk+=`<div class="stk-info" style="color:var(--acc)">点击目标容器（放到它后面）</div><button class="btn bg" onclick="cancelDepthMode()">取消</button>`;
-    }else{
-      dk+=`<button class="btn bor" onclick="enterDepthMode('${c.id}')">放到其他容器后面…</button>`;
-    }
-    dk+='</div>';
+    // Build action buttons row
+    let acts='<button class="btn bp" onclick="startEdit()">✎ 编辑</button><button class="btn bdn" onclick="delC()">✕ 删除</button>';
+    if(c.stackParent&&parentC)acts+=`<button class="btn bor" onclick="unstack('${c.id}')">取消叠放</button>`;
+    else if(child)acts+=`<button class="btn bor" onclick="unstack('${child.c.id}')">取消叠放</button>`;
+    else if(sameLv.length)acts+=`<button class="btn bor" onclick="enterStk('${c.id}')">叠放…</button>`;
+    if(c.depthParent)acts+=`<button class="btn bor" onclick="unDepth('${c.id}')">取消后排</button>`;
+    else if(S.depthMode)acts+=`<button class="btn bg" onclick="cancelDepthMode()">取消</button>`;
+    else acts+=`<button class="btn bor" onclick="enterDepthMode('${c.id}')">放到后面…</button>`;
     // Photo viewer
     const shelf=S.shelves[S.shelfIdx];
     const photoSrc=shelf.shelfPhoto?SHELF_PHOTOS[shelf.shelfPhoto]:null;
@@ -561,7 +553,7 @@ function renderPanel(){
     }
     return `<div class="ic"><div class="ic-n">${esc(c.label)}</div><div class="ic-m">${t.l} · ${SL[c.size]||'中'} · ${esc(l.label)}</div>
       <div class="ir"><span class="ir-k">地点</span><span class="ir-v">${renderLoc(c.location,c.coordinates)}</span></div><div class="ir"><span class="ir-k">处理</span><span class="ir-v">${renderTreat(c.treatment||(c.amendment?c.amendment:''))}</span></div>${ir('添加量',c.amendmentAmount)}${ir('深度',c.samplingDepth)}${ir('添加日期',c.amendmentDate)}${ir('采样日期',c.samplingDate)}${ir('负责人',c.person)}${ir('备注',c.notes)}${ir('状态',`<span style="color:${c.status==='在库'?'var(--grn)':'#b07020'}">${c.status||'在库'}</span>`)}
-      <div class="ia"><button class="btn bp" onclick="startEdit()">✎ 编辑</button><button class="btn bdn" onclick="delC()">✕ 删除</button></div>${sk}${dk}${photoH}</div>`;
+      <div class="ia">${acts}</div>${photoH}</div>`;
   }
   if(S.tab==='edit'){
     if(!S.editing&&!S.adding)return '<div class="empty">'+(S.sel?'点击「编辑」修改':'请先选择容器')+'</div>';const f=S.ef;
