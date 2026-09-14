@@ -32803,9 +32803,20 @@ async function cloudRead(){
  const r=await fetch(cloudURL+'?ref=main',{headers:cloudHeaders(true),cache:'no-store',signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('读取云端内容失败（'+r.status+'）');const text=await r.text(),bytes=new TextEncoder().encode(text),head=new TextEncoder().encode('blob '+bytes.length+'\0'),combined=new Uint8Array(head.length+bytes.length);combined.set(head);combined.set(bytes,head.length);const sha=[...new Uint8Array(await crypto.subtle.digest('SHA-1',combined))].map(x=>x.toString(16).padStart(2,'0')).join('');if(sha!==info.sha)throw Error('云端正在变化，请稍后重试');const data=JSON.parse(text);if(data.format!=='soil-cloud-v4'||!data.payload)throw Error('云端数据格式不匹配');M.validate({...M.copy(state),core:data.payload.core,assets:data.payload.assets,events:data.payload.events});return {sha,payload:data.payload};
 }
 async function cloudAdopt(payload){
- if(dirty()||ui.photoDraft||pending||draftTimer)throw Error('有未提交草稿，稍后同步');const changed=!SoilCloudModel.same(cloudPayload(),payload);if(changed){const next=M.copy(state);Object.assign(next,M.copy(payload));next.revision++;next.undo=[];next.redo=[];next.draft=null;await writeRecord(next);state=next;render();}cloudBase=M.copy(payload);await cloudMeta({base:cloudBase,sha:cloudSha});
+ if(dirty()||ui.photoDraft||pending||draftTimer)throw Error('有未提交草稿，稍后同步');
+ if(!SoilCloudModel.same(cloudPayload(),payload)){
+  const before=M.copy(state),next=M.copy(state);Object.assign(next,M.copy(payload));next.revision++;
+  if(!SoilCloudModel.same(before.core,next.core)){next.undo=[];next.redo=[];}next.draft=null;
+  // Share the local persistence queue so a concurrent undo cannot race its disk write.
+  const adoption=queue.then(async()=>{if(!SoilCloudModel.same(state,before)||dirty()||ui.photoDraft)throw Error('同步期间有新修改，本机内容已保留');await writeRecord(next);});
+  queue=adoption.catch(()=>{});await adoption;
+  if(!SoilCloudModel.same(state,before)||dirty()||ui.photoDraft){await persist();throw Error('同步期间有新修改，本机内容已保留');}
+  state=next;render();
+ }
+ cloudBase=M.copy(payload);await cloudMeta({base:cloudBase,sha:cloudSha});
 }
-function cloudSchedule(){if(!cloudReady||cloudBusy||cloudConflict||!cloudConfigured)return;clearTimeout(cloudTimer);cloudStatus('本机已保存 · 等待云同步');cloudTimer=setTimeout(()=>cloudSync(),1800);}
+let cloudResyncRequested=false;
+function cloudSchedule(){if(!cloudReady||cloudConflict||!cloudConfigured)return;if(cloudBusy){cloudResyncRequested=true;return;}clearTimeout(cloudTimer);cloudStatus('本机已保存 · 等待云同步');cloudTimer=setTimeout(()=>cloudSync(),1800);}
 async function cloudSync(allowCreate=false){
  if(cloudBusy)return;if(!cloudConfigured){cloudStatus('同步服务尚未启用 · 本机保存正常');return;}if(blocked||!db){cloudStatus('本机存储不可用 · 云同步暂停');return;}if(dirty()||ui.photoDraft||['edit','photo'].includes(ui.view)||pending||draftTimer){cloudStatus('正在编辑 · 云同步暂缓');return;}cloudBusy=true;cloudConflict=false;cloudStatus('正在核对云端…');const start=cloudPayload();
  try{const remote=await cloudRead();cloudRemote=remote;if(!SoilCloudModel.same(start,cloudPayload())||dirty()||ui.photoDraft)throw Error('同步期间有新修改，稍后重试');let wanted=start;
@@ -32819,7 +32830,7 @@ async function cloudSync(allowCreate=false){
  const r=await fetch(cloudURL,{method:'PUT',signal:AbortSignal.timeout(20000),headers:{...cloudHeaders(),'Content-Type':'application/json'},body:JSON.stringify({branch:'main',message:'土样数据同步 · '+(operatorName||'操作人'),content:btoa(binary),...(cloudSha?{sha:cloudSha}:{})})});if(!r.ok){if(r.status===409||r.status===422){cloudConflict=true;throw Error('云端已有新版本 · 本机修改已保留');}throw Error('上传失败（'+r.status+'），本机修改已保留');}
  const uploaded=await r.json();const verify=await cloudRead();if(!verify||verify.sha!==uploaded.content.sha||!SoilCloudModel.same(verify.payload,wanted))throw Error('上传后的云端读回不一致，请重试核对');cloudSha=verify.sha;cloudBase=M.copy(wanted);await cloudMeta({base:cloudBase,sha:cloudSha});
  if(SoilCloudModel.same(start,cloudPayload())&&!dirty()&&!ui.photoDraft){await cloudAdopt(wanted);cloudStatus('已上传云端 · 读回校验通过');}else cloudStatus('上一版已上传 · 新修改待同步');
- }catch(e){cloudStatus(e.message||'网络不可用 · 本机修改已保留');}finally{cloudBusy=false;}
+ }catch(e){cloudStatus(e.message||'网络不可用 · 本机修改已保留');}finally{cloudBusy=false;if(cloudResyncRequested){cloudResyncRequested=false;cloudSchedule();}}
 }
 function cloudSettings(){const d=document.createElement('dialog');d.className='operator-dialog';d.innerHTML=`<form><h2>GitHub 云同步</h2><p>仓库：hongzhongDaLv/soil</p><p class="hint">输入名单内的姓名后自动同步，无需填写令牌。</p><p class="hint">姓名用于台账署名，不验证本人身份。</p><p class="cloud-dialog-status" role="status"></p><div class="toolbar"><button type="button" data-close>关闭</button><button type="submit" class="primary">连接并同步当前数据</button></div>${cloudConflict?'<hr><p>本机与云端有差异，暂未覆盖任何一方。</p><button type="button" data-cloud-use>下载本机备份，再采用云端版本</button>':''}</form>`;document.body.append(d);d.showModal();d.querySelector('[data-close]').onclick=()=>d.remove();d.addEventListener('cancel',()=>d.remove());d.querySelector('[data-cloud-use]')?.addEventListener('click',async()=>{exportJSON();if(!confirm('请确认已保留下载的本机备份。采用云端版本将替换本机正式记录并清空撤回栈，是否继续？'))return;try{const remote=await cloudRead();if(!remote)throw Error('云端不存在');cloudSha=remote.sha;await cloudAdopt(remote.payload);cloudConflict=false;cloudStatus('已采用云端版本');d.remove();}catch(e){d.querySelector('.cloud-dialog-status').textContent=e.message;}});
  d.querySelector('form').onsubmit=async e=>{e.preventDefault();d.remove();await cloudSync(true);};
@@ -33954,7 +33965,7 @@ else if(a==='add-tag'){const t=$('#custom-tag').value.trim();if(t)editTreatment(
 else if(a==='settings-add-tag'){const t=$('#settings-tag').value.trim();if(t&&!/[,，、/;；]/.test(t))run('添加处理标签：'+t,c=>{if(!c.tags.includes(t))c.tags.push(t);});else toast('请填写单个标签，组合使用 +');}
 else if(a==='move')moveDialog();
 else if(a==='delete'){if(!ctn())return;const id=ui.sel,c=ctn();if(M.attachedIds(state.core,id).length>1){modal('暂不能移除', '<p>这个容器上方或后方还有依附容器，请先将它们移开，再移除当前容器。</p>',[{label:'知道了'}]);return;}guard(()=>modal('移除容器：'+c.label,`<p>原位置：${esc(M.position(state.core,id))}</p><p>仅移除当前容器及其当前照片标注，历史记录保留；操作后可从顶部撤回。</p>`,[{label:'取消'},{label:'删除容器',class:'danger',fn:()=>run('删除容器',core=>M.remove(core,id))}]));}
-else if(a==='undo'||a==='redo'){if(ui.photoDraft){toast('请先保存或取消图片更新');return;}guard(()=>{const ev=a==='undo'?M.undo(state):M.redo(state);if(ev){ev.actor=operatorName||'本机用户';persist();render();toast(ev.title);}});}
+else if(a==='undo'||a==='redo'){if(ui.photoDraft){toast('请先保存或取消图片更新');return;}guard(()=>{try{const ev=a==='undo'?M.undo(state):M.redo(state);if(ev){ev.actor=operatorName||'本机用户';if(ui.view==='edit')ui.view=ctn()?'info':'board';persist();render();toast(ev.title);}else toast('没有可'+(a==='undo'?'撤回':'重做')+'的操作');}catch(e){toast(e.message);}});}
 else if(a==='filters'){ui.more=!ui.more;render();}else if(a==='clear-filter'){for(const k in ui.filters)ui.filters[k]='';render();}
 else if(a==='export-html')exportHTML();else if(a==='export-json')exportJSON();else if(a==='export-csv')exportCSV();else if(a==='export-log')download('土样台账_'+dateName()+'.json',JSON.stringify({events:state.events,legacyLog:state.legacyLog},null,2),'application/json');
 else if(a==='position-left'||a==='position-right'){run('调整位置左右顺序',core=>{const l=core.shelves.find(s=>s.id===ui.shelf).levels.find(l=>l.id===b.dataset.level),i=l.groups.findIndex(g=>g.id===b.dataset.group),j=i+(a==='position-left'?-1:1);if(j<0||j>=l.groups.length)return;[l.groups[i],l.groups[j]]=[l.groups[j],l.groups[i]];});}
